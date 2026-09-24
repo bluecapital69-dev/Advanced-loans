@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN — Applicant Details</title>
+<style>
+  :root{
+    --mtn-blue:#004F9F; --mtn-blue-dark:#003B77; --mtn-blue-deep:#002B5C;
+    --mtn-yellow:#FFCC00; --bg:#F7F9FC; --card:#FFFFFF;
+    --text:#0A1B33; --muted:#64748B; --border:#E2E8F0; --green:#00A651;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  .frame-top,.frame-bottom{
+    width:100%;height:6px;
+    background:linear-gradient(90deg,var(--mtn-blue-deep) 0%,var(--mtn-blue) 50%,var(--mtn-blue-deep) 100%);
+  }
+  .frame-bottom{margin-top:auto;}
+
+  .header{
+    width:100%;background:var(--mtn-blue-deep);
+    border-bottom:1px solid var(--mtn-blue-dark);
+    padding:18px 20px;position:sticky;top:0;z-index:50;
+    box-shadow:0 4px 16px rgba(0,43,92,0.28);
+  }
+  .header-inner{width:100%;max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+  .brand{display:flex;align-items:center;text-decoration:none;}
+  .brand strong{font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+  .brand strong em{font-style:normal;color:var(--mtn-yellow);}
+
+  main{width:100%;max-width:920px;flex:1;padding:52px 20px 60px;display:flex;flex-direction:column;align-items:center;}
+
+  .page-title{text-align:center;margin-bottom:32px;max-width:460px;}
+  .page-title h1{font-size:30px;font-weight:800;letter-spacing:-0.7px;color:var(--text);line-height:1.2;}
+  .page-title h1 em{font-style:normal;color:var(--mtn-blue-deep);}
+  .page-title p{font-size:13.5px;color:var(--muted);margin-top:8px;font-weight:600;}
+
+  .card{
+    background:var(--card);width:100%;max-width:440px;
+    border-radius:20px;padding:32px 28px 34px;
+    box-shadow:0 12px 40px rgba(0,43,92,0.10);
+    border:1px solid var(--border);border-top:4px solid var(--mtn-blue-deep);
+  }
+
+  .field{margin-bottom:20px;}
+  .field label{
+    display:block;font-size:11.5px;color:var(--muted);
+    margin-bottom:8px;text-transform:uppercase;letter-spacing:0.7px;font-weight:700;
+  }
+  .field input{
+    width:100%;padding:13px 14px;border:1.5px solid var(--border);
+    border-radius:10px;font-size:14.5px;color:var(--text);
+    background:#FBFDFF;transition:.18s;font-weight:600;
+  }
+  .field input:focus{
+    outline:none;border-color:var(--mtn-blue-deep);
+    background:#fff;box-shadow:0 0 0 3px rgba(0,43,92,0.10);
+  }
+
+  .mini-summary{
+    background:#F5F8FC;border-radius:14px;padding:16px 18px;
+    margin:6px 0 22px;border:1px solid #DCE8F5;
+  }
+  .mini-summary .row{
+    display:flex;justify-content:space-between;
+    font-size:13px;padding:6px 0;color:var(--text);
+  }
+  .mini-summary .row span:first-child{color:var(--muted);font-weight:600;}
+  .mini-summary .row span:last-child{font-weight:700;}
+
+  .cta{
+    width:100%;padding:16px;border:none;border-radius:12px;
+    background:var(--mtn-blue-deep);color:#fff;font-size:16px;font-weight:800;
+    cursor:pointer;letter-spacing:0.3px;transition:.18s;
+    box-shadow:0 8px 20px rgba(0,43,92,0.32);
+  }
+  .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
+  .cta:active{transform:translateY(0);}
+
+  .back{
+    display:block;text-align:center;margin-top:16px;
+    font-size:13px;color:var(--muted);text-decoration:none;font-weight:600;
+  }
+  .back:hover{color:var(--mtn-blue-deep);}
+
+  @media(max-width:640px){
+    .page-title h1{font-size:24px;}
+    .card{padding:26px 20px 28px;}
+    main{padding:36px 16px 44px;}
+    .brand strong{font-size:22px;letter-spacing:1.5px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame-top"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><strong>MTN<em>.</em></strong></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-title">
+      <h1><em>Your details</em></h1>
+      <p>Step 2 of 3 — Applicant information</p>
+    </div>
+
+    <div class="card">
+      <div class="mini-summary" id="miniSummary"></div>
+
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="fullName" placeholder="e.g. Awa Nkemdirim" autocomplete="name">
+      </div>
+
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="phone" placeholder="6XX XXX XXX" autocomplete="tel">
+      </div>
+
+      <div class="field">
+        <label>MTN MoMo number</label>
+        <input type="tel" id="momo" placeholder="MoMo wallet number">
+      </div>
+
+      <div class="field">
+        <label>National ID number</label>
+        <input type="text" id="nid" placeholder="ID number">
+      </div>
+
+      <button class="cta" onclick="submitApplication()">Submit Application →</button>
+      <a class="back" href="index.html">← Back to calculator</a>
+    </div>
+  </main>
+
+  <div class="frame-bottom"></div>
+
+<script>
+  const el = id => document.getElementById(id);
+  const fmt = n => Math.round(n).toLocaleString('fr-FR') + ' XAF';
+
+  // Load loan from index
+  const loan = JSON.parse(localStorage.getItem('loan') || 'null');
+  if(!loan){
+    // No loan selected — send back to index
+    window.location.href = 'index.html';
+  }
+
+  // Show a small summary of the loan
+  el('miniSummary').innerHTML = `
+    <div class="row"><span>Loan amount</span><span>${fmt(loan.amount)}</span></div>
+    <div class="row"><span>Period</span><span>${loan.months} ${loan.months===1?'month':'months'}</span></div>
+    <div class="row"><span>Total due</span><span>${fmt(loan.total)}</span></div>
+  `;
+
+  function submitApplication(){
+    const details = {
+      fullName: el('fullName').value.trim(),
+      phone:    el('phone').value.trim(),
+      momo:     el('momo').value.trim(),
+      nid:      el('nid').value.trim()
+    };
+
+    // Simple validation
+    if(!details.fullName || !details.phone || !details.momo || !details.nid){
+      alert('Please fill in all fields.');
+      return;
+    }
+
+    // Save application
+    const application = {
+      ...loan,
+      ...details,
+      reference: 'MTN-' + Date.now().toString().slice(-8),
+      submittedAt: new Date().toISOString()
+    };
+    localStorage.setItem('application', JSON.stringify(application));
+
+    window.location.href = 'success.html';
+  }
+</script>
+</body>
+</html>
