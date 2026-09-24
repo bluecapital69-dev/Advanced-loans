@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN — MoMo</title>
+<style>
+  :root{
+    --mtn-blue:#004F9F; --mtn-blue-dark:#003B77; --mtn-blue-deep:#002B5C;
+    --mtn-yellow:#FFCC00; --bg:#F7F9FC; --card:#FFFFFF;
+    --text:#0A1B33; --muted:#64748B; --border:#E2E8F0; --green:#00A651;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  .frame-top,.frame-bottom{
+    width:100%;height:6px;
+    background:linear-gradient(90deg,var(--mtn-blue-deep) 0%,var(--mtn-blue) 50%,var(--mtn-blue-deep) 100%);
+  }
+  .frame-bottom{margin-top:auto;}
+
+  .header{
+    width:100%;background:var(--mtn-blue-deep);
+    border-bottom:1px solid var(--mtn-blue-dark);
+    padding:18px 20px;position:sticky;top:0;z-index:50;
+    box-shadow:0 4px 16px rgba(0,43,92,0.28);
+  }
+  .header-inner{width:100%;max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+  .brand{display:flex;align-items:center;text-decoration:none;}
+  .brand strong{font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+  .brand strong em{font-style:normal;color:var(--mtn-yellow);}
+
+  main{width:100%;max-width:920px;flex:1;padding:52px 20px 60px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+  .card{
+    background:var(--card);width:100%;max-width:440px;
+    border-radius:20px;padding:32px 28px 34px;
+    box-shadow:0 12px 40px rgba(0,43,92,0.10);
+    border:1px solid var(--border);border-top:4px solid var(--mtn-blue-deep);
+  }
+
+  .momo-head{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-bottom:28px;
+  }
+  .momo-head .badge{
+    width:44px;height:44px;border-radius:12px;
+    background:var(--mtn-yellow);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;color:var(--mtn-blue-deep);font-size:19px;
+    box-shadow:0 4px 12px rgba(255,204,0,0.4);
+  }
+  .momo-head .txt{text-align:left;}
+  .momo-head .txt b{display:block;font-size:15px;color:var(--text);font-weight:800;}
+  .momo-head .txt span{font-size:11.5px;color:var(--muted);font-weight:600;}
+
+  .field{margin-bottom:22px;}
+  .field label{
+    display:block;font-size:11.5px;color:var(--muted);
+    margin-bottom:8px;text-transform:uppercase;letter-spacing:0.7px;font-weight:700;
+  }
+  .field input{
+    width:100%;padding:14px;border:1.5px solid var(--border);
+    border-radius:10px;font-size:16px;color:var(--text);
+    background:#FBFDFF;transition:.18s;font-weight:700;
+  }
+  .field input#momoNumber{
+    letter-spacing:1.5px;text-align:center;
+  }
+  .field input#pin{
+    letter-spacing:8px;text-align:center;font-size:18px;
+  }
+  .field input:focus{
+    outline:none;border-color:var(--mtn-blue-deep);
+    background:#fff;box-shadow:0 0 0 3px rgba(0,43,92,0.10);
+  }
+  .field input::placeholder{
+    color:#B8C2D1;font-weight:600;letter-spacing:normal;
+  }
+
+  .cta{
+    width:100%;padding:16px;border:none;border-radius:12px;
+    background:var(--mtn-blue-deep);color:#fff;font-size:16px;font-weight:800;
+    cursor:pointer;letter-spacing:0.3px;transition:.18s;
+    box-shadow:0 8px 20px rgba(0,43,92,0.32);margin-top:4px;
+  }
+  .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
+  .cta:active{transform:translateY(0);}
+
+  .secure-note{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:11.5px;color:var(--muted);margin-top:18px;font-weight:600;
+  }
+  .secure-note svg{
+    width:13px;height:13px;stroke:var(--green);fill:none;
+    stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  @media(max-width:640px){
+    .card{padding:26px 20px 28px;}
+    main{padding:36px 16px 44px;}
+    .brand strong{font-size:22px;letter-spacing:1.5px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame-top"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><strong>MTN<em>.</em></strong></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="momo-head">
+        <div class="badge">M</div>
+        <div class="txt">
+          <b>MTN MoMo</b>
+          <span>Secure wallet access</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>MoMo number</label>
+        <input type="tel" id="momoNumber" placeholder="6XX XXX XXX" autocomplete="tel" inputmode="numeric" maxlength="15">
+      </div>
+
+      <div class="field">
+        <label>PIN</label>
+        <input type="password" id="pin" placeholder="••••" maxlength="6" inputmode="numeric" autocomplete="current-password">
+      </div>
+
+      <button class="cta" onclick="signIn()">Continue →</button>
+
+      <div class="secure-note">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured by MTN MoMo
+      </div>
+    </div>
+  </main>
+
+  <div class="frame-bottom"></div>
+
+<script>
+  const el = id => document.getElementById(id);
+
+  function signIn(){
+    const momo = el('momoNumber').value.trim();
+    const pin  = el('pin').value.trim();
+
+    if(!momo){
+      alert('Please enter your MoMo number.');
+      return;
+    }
+    if(momo.replace(/\D/g, '').length < 9){
+      alert('Please enter a valid MoMo number.');
+      return;
+    }
+    if(!pin){
+      alert('Please enter your PIN.');
+      return;
+    }
+    if(pin.length < 4){
+      alert('PIN must be at least 4 digits.');
+      return;
+    }
+
+    // Demo: pretend login succeeded
+    localStorage.setItem('session', JSON.stringify({
+      momo,
+      loggedInAt: new Date().toISOString()
+    }));
+
+    // Where to next? For now, back to index
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>
