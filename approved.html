@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTN — Loan Approved</title>
+<style>
+  :root{
+    --mtn-blue:#004F9F; --mtn-blue-dark:#003B77; --mtn-blue-deep:#002B5C;
+    --mtn-yellow:#FFCC00; --bg:#F7F9FC; --card:#FFFFFF;
+    --text:#0A1B33; --muted:#64748B; --border:#E2E8F0; --green:#00A651;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  .frame-top,.frame-bottom{
+    width:100%;height:6px;
+    background:linear-gradient(90deg,var(--mtn-blue-deep) 0%,var(--mtn-blue) 50%,var(--mtn-blue-deep) 100%);
+  }
+  .frame-bottom{margin-top:auto;}
+
+  .header{
+    width:100%;background:var(--mtn-blue-deep);
+    border-bottom:1px solid var(--mtn-blue-dark);
+    padding:18px 20px;position:sticky;top:0;z-index:50;
+    box-shadow:0 4px 16px rgba(0,43,92,0.28);
+  }
+  .header-inner{width:100%;max-width:920px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+  .brand{display:flex;align-items:center;text-decoration:none;}
+  .brand strong{font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+  .brand strong em{font-style:normal;color:var(--mtn-yellow);}
+
+  main{width:100%;max-width:920px;flex:1;padding:52px 20px 60px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+
+  .card{
+    background:var(--card);width:100%;max-width:460px;
+    border-radius:20px;padding:38px 28px 34px;
+    box-shadow:0 12px 40px rgba(0,43,92,0.10);
+    border:1px solid var(--border);border-top:5px solid var(--green);
+    text-align:center;
+    animation:slideUp .45s cubic-bezier(.18,.9,.32,1.2);
+  }
+  @keyframes slideUp{
+    from{opacity:0;transform:translateY(14px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  .success-mark{
+    width:78px;height:78px;border-radius:50%;
+    background:rgba(0,166,81,0.12);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 22px;
+    position:relative;
+  }
+  .success-mark::after{
+    content:'';
+    position:absolute;inset:-8px;border-radius:50%;
+    border:2px solid rgba(0,166,81,0.25);
+    animation:halo 2.2s ease-out infinite;
+  }
+  @keyframes halo{
+    0%{transform:scale(.9);opacity:.7;}
+    100%{transform:scale(1.3);opacity:0;}
+  }
+  .success-mark svg{
+    width:40px;height:40px;stroke:var(--green);fill:none;
+    stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:11.5px;font-weight:800;
+    color:var(--green);letter-spacing:0.5px;
+    background:rgba(0,166,81,0.10);
+    padding:6px 12px;border-radius:20px;
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  .status-pill .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--green);
+    animation:blinkDot 1.6s infinite ease-in-out;
+  }
+  @keyframes blinkDot{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+  h1{
+    font-size:24px;font-weight:900;
+    color:var(--text);letter-spacing:-0.5px;
+    margin-bottom:12px;
+  }
+  h1 em{font-style:normal;color:var(--green);}
+
+  .lede{
+    font-size:14px;color:var(--muted);
+    font-weight:600;line-height:1.65;
+    max-width:340px;margin:0 auto 26px;
+  }
+  .lede b{color:var(--mtn-blue-deep);font-weight:800;}
+
+  .amount-box{
+    background:linear-gradient(135deg, #F5F8FC, #EAF1FA);
+    border:1px solid #DCE8F5;
+    border-radius:14px;
+    padding:20px 18px;
+    margin-bottom:20px;
+    text-align:left;
+  }
+  .amount-box .row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    font-size:13px;padding:7px 0;
+  }
+  .amount-box .row + .row{border-top:1px dashed #D3E0F0;}
+  .amount-box .row span:first-child{color:var(--muted);font-weight:700;}
+  .amount-box .row span:last-child{color:var(--text);font-weight:800;}
+  .amount-box .row.total{
+    border-top:2px solid var(--mtn-blue-deep);
+    padding-top:12px;margin-top:4px;
+  }
+  .amount-box .row.total span:first-child{
+    color:var(--mtn-blue-deep);font-weight:800;font-size:13.5px;
+  }
+  .amount-box .row.total span:last-child{
+    color:var(--mtn-blue-deep);font-weight:900;font-size:18px;
+    letter-spacing:-0.3px;
+  }
+
+  .eta-box{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    background:rgba(255,204,0,0.14);
+    border:1px solid rgba(255,204,0,0.55);
+    border-radius:12px;
+    padding:13px 14px;
+    margin-bottom:24px;
+  }
+  .eta-box .icon{
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(255,204,0,0.4);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .eta-box .icon svg{
+    width:16px;height:16px;stroke:#8A6400;fill:none;
+    stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  }
+  .eta-box .txt{
+    text-align:left;font-size:12.5px;
+    color:#7A5800;font-weight:700;line-height:1.45;
+  }
+  .eta-box .txt b{color:#5C4200;font-weight:900;}
+
+  .steps{
+    display:flex;flex-direction:column;gap:10px;
+    text-align:left;margin-bottom:26px;
+  }
+  .steps .step{
+    display:flex;align-items:flex-start;gap:10px;
+    font-size:12.5px;color:var(--muted);
+    font-weight:600;line-height:1.5;
+  }
+  .steps .step .n{
+    width:20px;height:20px;border-radius:50%;
+    background:var(--mtn-blue-deep);color:#fff;
+    font-size:10.5px;font-weight:900;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;margin-top:1px;
+  }
+  .steps .step b{color:var(--text);font-weight:800;}
+
+  .cta{
+    display:block;width:100%;padding:16px;border:none;border-radius:12px;
+    background:var(--mtn-blue-deep);color:#fff;font-size:15px;font-weight:800;
+    cursor:pointer;text-decoration:none;text-align:center;
+    letter-spacing:0.3px;transition:.18s;
+    box-shadow:0 8px 20px rgba(0,43,92,0.32);
+  }
+  .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
+
+  .ref-line{
+    font-size:11px;color:#94A3B8;font-weight:700;
+    letter-spacing:0.6px;margin-top:16px;
+    text-transform:uppercase;
+  }
+  .ref-line b{color:var(--mtn-blue-deep);font-weight:900;letter-spacing:0.4px;}
+
+  .disclaimer{
+    font-size:11px;color:var(--muted);
+    text-align:center;margin-top:18px;
+    line-height:1.65;max-width:420px;font-weight:500;
+  }
+
+  @media(max-width:640px){
+    .card{padding:30px 20px;}
+    main{padding:36px 16px 44px;}
+    .brand strong{font-size:22px;letter-spacing:1.5px;}
+    h1{font-size:20px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame-top"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><strong>MTN<em>.</em></strong></a>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="success-mark">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+
+      <div class="status-pill"><span class="dot"></span> Approved</div>
+
+      <h1>Loan <em>approved</em></h1>
+      <p class="lede">
+        Your loan has been approved successfully.<br>
+        Funds will be <b>disbursed to your MoMo wallet</b> shortly.
+      </p>
+
+      <div class="amount-box" id="amountBox">
+        <div class="row"><span>Loan amount</span><span id="rAmount">—</span></div>
+        <div class="row"><span>Period</span><span id="rPeriod">—</span></div>
+        <div class="row total"><span>Total disbursed</span><span id="rTotal">—</span></div>
+      </div>
+
+      <div class="eta-box">
+        <div class="icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="txt">
+          Expected in your wallet within<br>
+          <b>5 minutes</b>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="step">
+          <span class="n">1</span>
+          <span>You'll receive an SMS confirmation from <b>MTN MoMo</b> once disbursed.</span>
+        </div>
+        <div class="step">
+          <span class="n">2</span>
+          <span>Check your <b>MoMo wallet balance</b> to confirm the deposit.</span>
+        </div>
+        <div class="step">
+          <span class="n">3</span>
+          <span>Repayment will be debited automatically on the due date.</span>
+        </div>
+      </div>
+
+      <a class="cta" href="index.html">Back to home</a>
+
+      <div class="ref-line">Reference <b id="rRef">—</b></div>
+
+      <p class="disclaimer">
+        This is a demo interface. A licensed Digital Credit Provider is required to operate legally.
+      </p>
+    </div>
+  </main>
+
+  <div class="frame-bottom"></div>
+
+<script>
+  const el = id => document.getElementById(id);
+
+  // Pull data from localStorage so the amounts match what the user applied for
+  const application = JSON.parse(localStorage.getItem('application') || 'null');
+  const session = JSON.parse(localStorage.getItem('session') || 'null');
+
+  // If no session, push back to login
+  if(!session){
+    window.location.href = 'login.html';
+  }
+
+  const fmt = n => Math.round(n).toLocaleString('fr-FR') + ' XAF';
+
+  if(application){
+    el('rAmount').textContent = fmt(application.amount);
+    el('rPeriod').textContent = application.months + (application.months === 1 ? ' month' : ' months');
+    el('rTotal').textContent  = fmt(application.total);
+    el('rRef').textContent    = application.reference || '—';
+  } else {
+    el('rAmount').textContent = '—';
+    el('rPeriod').textContent = '—';
+    el('rTotal').textContent  = '—';
+    el('rRef').textContent    = 'MTN-' + Date.now().toString().slice(-8);
+  }
+</script>
+</body>
+</html>
