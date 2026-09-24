@@ -58,7 +58,7 @@ def notify():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
-# 👇 This serves your HTML files
+# 👇 Serves your HTML files (index.html, apply.html, etc.)
 @app.route("/<path:filename>")
 def static_files(filename):
     return send_from_directory(".", filename)
