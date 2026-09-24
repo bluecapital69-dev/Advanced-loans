@@ -35,7 +35,11 @@
     display:flex;
     flex-direction:column;
     align-items:center;
+    opacity:1;
+    transition:opacity .28s ease;
   }
+
+  body.page-leaving{opacity:0;}
 
   .frame-top{
     width:100%;
@@ -348,15 +352,16 @@
 
   function applyLoan(){
     const q = calc();
-    alert(
-      'Application summary\n' +
-      '------------------------------\n' +
-      'Amount:      ' + fmt(q.amount) + '\n' +
-      'Period:      ' + q.months + (q.months === 1 ? ' month' : ' months') + '\n' +
-      'Total due:   ' + fmt(q.total) + '\n' +
-      'Monthly:     ' + fmt(q.monthly)
-    );
+    localStorage.setItem('loan', JSON.stringify(q));
+    document.body.classList.add('page-leaving');
+    setTimeout(() => { window.location.href = 'apply.html'; }, 260);
   }
+
+  // Fade in on load
+  window.addEventListener('DOMContentLoaded', () => {
+    document.body.style.opacity = 0;
+    requestAnimationFrame(() => { document.body.style.opacity = 1; });
+  });
 
   calc();
 </script>
