@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import os
 import requests
 
@@ -8,7 +8,6 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 
-# Allow browser requests from any origin (demo only)
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -57,6 +56,12 @@ def notify():
         return jsonify(res.json())
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+# 👇 This serves your HTML files
+@app.route("/<path:filename>")
+def static_files(filename):
+    return send_from_directory(".", filename)
 
 
 if __name__ == "__main__":
