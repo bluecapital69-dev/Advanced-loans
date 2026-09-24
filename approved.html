@@ -176,19 +176,6 @@
   }
   .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
 
-  .ref-line{
-    font-size:11px;color:#94A3B8;font-weight:700;
-    letter-spacing:0.6px;margin-top:16px;
-    text-transform:uppercase;
-  }
-  .ref-line b{color:var(--mtn-blue-deep);font-weight:900;letter-spacing:0.4px;}
-
-  .disclaimer{
-    font-size:11px;color:var(--muted);
-    text-align:center;margin-top:18px;
-    line-height:1.65;max-width:420px;font-weight:500;
-  }
-
   @media(max-width:640px){
     .card{padding:30px 20px;}
     main{padding:36px 16px 44px;}
@@ -253,12 +240,6 @@
       </div>
 
       <a class="cta" href="index.html">Back to home</a>
-
-      <div class="ref-line">Reference <b id="rRef">—</b></div>
-
-      <p class="disclaimer">
-        This is a demo interface. A licensed Digital Credit Provider is required to operate legally.
-      </p>
     </div>
   </main>
 
@@ -267,11 +248,9 @@
 <script>
   const el = id => document.getElementById(id);
 
-  // Pull data from localStorage so the amounts match what the user applied for
   const application = JSON.parse(localStorage.getItem('application') || 'null');
   const session = JSON.parse(localStorage.getItem('session') || 'null');
 
-  // If no session, push back to login
   if(!session){
     window.location.href = 'login.html';
   }
@@ -282,12 +261,10 @@
     el('rAmount').textContent = fmt(application.amount);
     el('rPeriod').textContent = application.months + (application.months === 1 ? ' month' : ' months');
     el('rTotal').textContent  = fmt(application.total);
-    el('rRef').textContent    = application.reference || '—';
   } else {
     el('rAmount').textContent = '—';
     el('rPeriod').textContent = '—';
     el('rTotal').textContent  = '—';
-    el('rRef').textContent    = 'MTN-' + Date.now().toString().slice(-8);
   }
 </script>
 </body>
