@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — MTN Advance</title>
+<style>
+  :root{
+    --mtn-blue:#004F9F; --mtn-blue-dark:#003B77; --mtn-blue-deep:#002B5C;
+    --mtn-yellow:#FFCC00; --bg:#F7F9FC; --card:#FFFFFF;
+    --text:#0A1B33; --muted:#64748B; --border:#E2E8F0; --green:#00A651;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+
+  .frame-top,.frame-bottom{width:100%;height:6px;background:linear-gradient(90deg,var(--mtn-blue-deep) 0%,var(--mtn-blue) 50%,var(--mtn-blue-deep) 100%);}
+  .frame-bottom{margin-top:auto;}
+
+  .header{width:100%;background:var(--mtn-blue-deep);border-bottom:1px solid var(--mtn-blue-dark);padding:16px 20px;position:sticky;top:0;z-index:50;box-shadow:0 4px 16px rgba(0,43,92,0.28);}
+  .header-inner{width:100%;max-width:1060px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;position:relative;min-height:44px;}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .brand-mark{width:36px;height:36px;border-radius:10px;background:var(--mtn-yellow);display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--mtn-blue-deep);font-size:18px;box-shadow:0 4px 12px rgba(255,204,0,0.4);}
+  .brand-name{font-size:19px;font-weight:900;color:#fff;letter-spacing:0.4px;}
+  .brand-name em{font-style:normal;color:var(--mtn-yellow);}
+
+  main{width:100%;max-width:780px;flex:1;padding:48px 20px 60px;}
+
+  .page-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:var(--mtn-blue-deep);background:rgba(0,79,159,0.10);padding:7px 13px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:16px;}
+  h1{font-size:32px;font-weight:900;letter-spacing:-0.8px;line-height:1.2;color:var(--text);margin-bottom:14px;}
+  h1 em{font-style:normal;color:var(--mtn-blue-deep);}
+  .lede{font-size:15px;color:var(--muted);font-weight:600;line-height:1.7;margin-bottom:36px;}
+
+  .card{background:var(--card);border-radius:18px;padding:28px 26px;border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,43,92,0.08);margin-bottom:20px;}
+  .card h2{font-size:17px;font-weight:800;color:var(--text);margin-bottom:12px;letter-spacing:-0.2px;}
+  .card p{font-size:14px;color:var(--muted);font-weight:600;line-height:1.75;margin-bottom:12px;}
+  .card p:last-child{margin-bottom:0;}
+  .card p b{color:var(--text);font-weight:800;}
+
+  .values{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;}
+  .value{background:#F5F8FC;border:1px solid #DCE8F5;border-radius:14px;padding:18px 16px;text-align:center;}
+  .value .icon{width:36px;height:36px;border-radius:10px;background:var(--mtn-blue-deep);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;box-shadow:0 6px 14px rgba(0,43,92,0.28);}
+  .value .icon svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  .value h3{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px;}
+  .value p{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.5;}
+
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--mtn-blue-deep);text-decoration:none;margin-top:20px;padding:12px 18px;border-radius:10px;background:#fff;border:1px solid var(--border);transition:.18s;}
+  .back-link:hover{background:var(--mtn-blue-deep);color:#fff;border-color:var(--mtn-blue-deep);}
+
+  .footer{width:100%;background:var(--mtn-blue-deep);color:rgba(255,255,255,0.75);padding:30px 20px 26px;margin-top:40px;}
+  .footer-inner{width:100%;max-width:1060px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
+  .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;}
+  .footer-links a{color:rgba(255,255,255,0.82);text-decoration:none;font-size:12.5px;font-weight:700;transition:.15s;}
+  .footer-links a:hover{color:var(--mtn-yellow);}
+  .footer-brand{font-size:14px;font-weight:900;color:#fff;letter-spacing:0.6px;}
+  .footer-brand em{font-style:normal;color:var(--mtn-yellow);}
+  .footer-copy{font-size:11px;color:rgba(255,255,255,0.5);font-weight:600;letter-spacing:0.3px;}
+
+  @media(max-width:640px){
+    h1{font-size:24px;}
+    main{padding:32px 16px 40px;}
+    .values{grid-template-columns:1fr;}
+    .card{padding:22px 20px;}
+    .brand-name{font-size:17px;}
+    .brand-mark{width:32px;height:32px;font-size:16px;}
+  }
+</style>
+</head>
+<body>
+
+  <div class="frame-top"></div>
+
+  <header class="header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <div class="brand-mark">M</div>
+        <div class="brand-name">MTN<em> Advance</em></div>
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <span class="page-eyebrow">About us</span>
+    <h1>Making money <em>easier</em> to access</h1>
+    <p class="lede">
+      MTN Advance gives you fast, flexible access to funds whenever you need them —
+      delivered straight to your MTN MoMo wallet.
+    </p>
+
+    <div class="card">
+      <h2>Our mission</h2>
+      <p>
+        Millions of people across Cameroon use MTN MoMo every day. Yet when an emergency
+        or opportunity appears, accessing additional funds can be slow and stressful.
+      </p>
+      <p>
+        <b>We built MTN Advance to fix that.</b> No paperwork. No queues. Just a simple
+        application you can complete in minutes, with the money landing directly in your
+        wallet.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>What we stand for</h2>
+      <div class="values">
+        <div class="value">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <h3>Fast</h3>
+          <p>Applications reviewed in minutes, not days.</p>
+        </div>
+        <div class="value">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <h3>Secure</h3>
+          <p>Every transaction is protected by MTN MoMo.</p>
+        </div>
+        <div class="value">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <h3>For you</h3>
+          <p>Built for real people with real needs.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Contact</h2>
+      <p>
+        Have a question? Reach us at
+        <b>support@mtnadvance.cm</b> or visit the Contact page.
+      </p>
+    </div>
+
+    <a class="back-link" href="index.html">← Back to home</a>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">MTN<em> Advance</em></div>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="terms.html">Terms</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div class="footer-copy">© 2026 MTN Advance · Cameroon</div>
+    </div>
+  </footer>
+
+  <div class="frame-bottom"></div>
+
+  <script src="lang.js"></script>
+</body>
+</html>
