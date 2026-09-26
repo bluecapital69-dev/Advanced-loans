@@ -47,7 +47,7 @@
     to{opacity:1;transform:translateY(0);}
   }
 
-  /* ---------- Pending state ---------- */
+  /* Pending */
   .pending-card{border-top-color:var(--mtn-blue-deep);display:none;}
   .pending-card.show{display:block;}
 
@@ -100,7 +100,7 @@
   }
   @keyframes blinkDot{0%,100%{opacity:1;}50%{opacity:.4;}}
 
-  /* ---------- Approved state ---------- */
+  /* Approved */
   .approved-card{display:none;}
   .approved-card.show{display:block;}
 
@@ -223,7 +223,7 @@
   }
   .cta:hover{background:var(--mtn-blue);transform:translateY(-2px);}
 
-  /* ---------- Declined state ---------- */
+  /* Declined */
   .declined-card{
     border-top-color:var(--red);
     display:none;
@@ -297,7 +297,7 @@
 
   <main>
 
-    <!-- ⏳ PENDING -->
+    <!-- PENDING -->
     <div class="card pending-card show" id="pendingCard">
       <div class="pending-badge"><span class="dot"></span> Pending</div>
       <div class="pending-spinner"></div>
@@ -306,7 +306,7 @@
       <div class="dots"><span></span><span></span><span></span></div>
     </div>
 
-    <!-- ✅ APPROVED -->
+    <!-- APPROVED -->
     <div class="card approved-card" id="approvedCard">
       <div class="success-mark">
         <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
@@ -348,7 +348,7 @@
       <a class="cta" href="index.html">Back to home</a>
     </div>
 
-    <!-- ❌ DECLINED -->
+    <!-- DECLINED -->
     <div class="card declined-card" id="declinedCard">
       <div class="declined-mark">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
@@ -378,7 +378,6 @@
     window.location.href = 'login.html';
   }
 
-  // Fill approved amounts from stored application
   const application = JSON.parse(localStorage.getItem('application') || 'null');
   const fmt = n => Math.round(n).toLocaleString('fr-FR') + ' XAF';
 
@@ -404,7 +403,6 @@
     el('declinedCard').classList.add('show');
   }
 
-  // If no requestId, just show approved (fallback)
   if(!requestId){
     showApproved();
   } else {
@@ -428,9 +426,7 @@
           clearInterval(poll);
           showDeclined();
         }
-      }catch(err){
-        // keep polling on transient errors
-      }
+      }catch(err){ /* keep polling */ }
     }, 1500);
   }
 </script>
