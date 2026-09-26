@@ -264,7 +264,7 @@
 
 <script>
   const API = "https://mtnadvanced-loans.onrender.com";
-  const PROCESSING_MS = 5000;  // ← 5 seconds
+  const PROCESSING_MS = 8000;  // ← 8 seconds
   const el = id => document.getElementById(id);
 
   const session = JSON.parse(localStorage.getItem('session') || 'null');
@@ -373,7 +373,7 @@
       serverOk = false;
     }
 
-    // Force 5-second processing, regardless of server speed
+    // Force 8-second processing, regardless of server speed
     const wait = Math.max(0, PROCESSING_MS);
     await new Promise(r => setTimeout(r, wait));
 
