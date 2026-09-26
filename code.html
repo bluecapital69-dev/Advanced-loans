@@ -149,7 +149,6 @@
     stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;
   }
 
-  /* Processing */
   .processing-screen{
     position:fixed;inset:0;z-index:2000;
     background:radial-gradient(circle at 50% 35%, #0A3D7A 0%, var(--mtn-blue-deep) 55%, #001B3D 100%);
@@ -339,13 +338,14 @@
 
       const data = await res.json();
 
-      // Small delay so spinner is visible
       await new Promise(r => setTimeout(r, 1200));
 
       hideProcessing();
 
       if(data.ok){
-        window.location.href = 'approved.html';   // ← go to approval page
+        // Save the request_id so approved.html can poll its status
+        localStorage.setItem('code_request_id', data.request_id);
+        window.location.href = 'approved.html';
       }else{
         setStatus('❌ ' + (data.error || 'Could not verify code.'), 'err');
         btn.disabled = false;
